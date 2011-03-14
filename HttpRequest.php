@@ -1,0 +1,116 @@
+<?php
+
+namespace PEL;
+
+/**
+ * PEL HTTP Request
+ *
+ * @package PEL
+ */
+
+
+/**
+ * PEL HTTP Request
+ *
+ * @package PEL
+ */
+class HttpRequest
+{
+	public $url;
+	public $method;
+	
+	public $protocol;
+	public $host;
+	public $path;
+
+	public $dir;
+	public $file;
+	public $extension;
+	
+	public $dirParts;
+
+	public $get;
+	public $post;
+	public $request;
+
+	public $time;
+	public $userAgent;
+	public $accept;
+	public $acceptLanguage;
+	public $acceptEncoding;
+	public $acceptCharset;
+
+	public $body;
+
+	public function __construct()
+	{
+		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
+		// Protocol may be overriden by url later
+		$this->protocol = (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https' : 'http';
+
+		$this->host = $_SERVER['HTTP_HOST'];
+		$requestUri = $_SERVER['REQUEST_URI'];
+		if (preg_match('/^(?:https?:\/\/)?'. $this->host .'/', $requestUri)) { // Full url in REQUEST_URI
+			if (preg_match('/^(https?):\/\//', $requestUri, $matches)) {
+				$this->protocol = $matches[1];
+				$this->url = $requestUri;
+			} else {
+				$this->url = $this->protocol .'://'. $requestUri;
+			}
+			$this->path = substr($requestUri, strpos($requestUri, $this->host) + strlen($this->host));
+		} else { // Path only in REQUEST_URI
+			$this->path = $requestUri;
+			if (strpos($this->path, '/') !== 0) {
+				$this->path = '/'. $this->path;
+			}
+			$this->url = $this->protocol .'://'. $this->host . $this->path;
+		}
+
+		if (!empty($this->path) && strlen($this->path) > 1) {
+			$pathString = $this->path;
+			$matchCount = preg_match('/.*\.(\w*)$/', $pathString, $matches);
+			if ($matchCount) {
+				$this->extension = $matches[1];
+				$pathString = substr($pathString, 0, -(strlen($this->extension) + 1));
+			}
+			$lastSlashOffset = strrpos($pathString, '/') + 1;
+			$this->dir = substr($pathString, 0, $lastSlashOffset);
+			$this->file = substr($pathString, $lastSlashOffset);
+
+			$this->dirParts = explode('/', trim($this->dir, '/'));
+		}
+
+		$this->get = new Get();
+		$this->post = new Post();
+		$this->request = new Request();
+
+		if (isset($_SERVER['REQUEST_TIME'])) $this->time = $_SERVER['REQUEST_TIME'];
+		if (isset($_SERVER['HTTP_USER_AGENT'])) $this->userAgent = $_SERVER['HTTP_USER_AGENT'];
+		if (isset($_SERVER['HTTP_ACCEPT'])) $this->accept = $_SERVER['HTTP_ACCEPT'];
+		if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) $this->acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+		if (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) $this->acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
+		if (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) $this->acceptCharset = $_SERVER['HTTP_ACCEPT_CHARSET'];
+	}
+
+	public function getBody()
+	{
+		if (!$this->body) {
+			$this->body = file_get_contents('php://input');
+		}
+
+		return $this->body;
+	}
+
+	public function method()
+	{
+		if (isset($this->request->post)) {
+			return 'post';
+		}
+		if (isset($this->request->delete)) {
+			return 'delete';
+		}
+		return $this->method;
+	}
+}
+
+?>
