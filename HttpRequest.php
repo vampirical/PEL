@@ -57,9 +57,9 @@ class HttpRequest
 			} else {
 				$this->url = $this->protocol .'://'. $requestUri;
 			}
-			$this->path = substr($requestUri, strpos($requestUri, $this->host) + strlen($this->host));
+			$this->path = parse_url(substr($requestUri, strpos($requestUri, $this->host) + strlen($this->host)), PHP_URL_PATH);
 		} else { // Path only in REQUEST_URI
-			$this->path = $requestUri;
+			$this->path = parse_url($requestUri, PHP_URL_PATH);
 			if (strpos($this->path, '/') !== 0) {
 				$this->path = '/'. $this->path;
 			}
