@@ -137,6 +137,55 @@ class Util
 		}
 		return $dec;
 	}
+
+	public static function strlcs($str1, $str2) {
+		$str1Len = strlen($str1);
+		$str2Len = strlen($str2);
+		$ret = array();
+	 
+		if($str1Len == 0 || $str2Len == 0)
+			return $ret; //no similarities
+	 
+		$CSL = array(); //Common Sequence Length array
+		$intLargestSize = 0;
+	 
+		//initialize the CSL array to assume there are no similarities
+		for($i=0; $i<$str1Len; $i++){
+			$CSL[$i] = array();
+			for($j=0; $j<$str2Len; $j++){
+				$CSL[$i][$j] = 0;
+			}
+		}
+	 
+		for($i=0; $i<$str1Len; $i++){
+			for($j=0; $j<$str2Len; $j++){
+				//check every combination of characters
+				if( $str1[$i] == $str2[$j] ){
+					//these are the same in both strings
+					if($i == 0 || $j == 0)
+						//it's the first character, so it's clearly only 1 character long
+						$CSL[$i][$j] = 1; 
+					else
+						//it's one character longer than the string from the previous character
+						$CSL[$i][$j] = $CSL[$i-1][$j-1] + 1; 
+	 
+					if( $CSL[$i][$j] > $intLargestSize ){
+						//remember this as the largest
+						$intLargestSize = $CSL[$i][$j]; 
+						//wipe any previous results
+						$ret = array();
+						//and then fall through to remember this new value
+					}
+					if( $CSL[$i][$j] == $intLargestSize )
+						//remember the largest string(s)
+						$ret[] = substr($str1, $i-$intLargestSize+1, $intLargestSize);
+				}
+				//else, $CSL should be set to 0, which it was already initialized to
+			}
+		}
+		//return the list of matches
+		return $ret;
+	}
 }
 
 ?>
