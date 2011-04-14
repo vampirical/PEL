@@ -103,13 +103,21 @@ class HttpRequest
 
 	public function method()
 	{
-		if (isset($this->request->post)) {
-			return 'post';
+		$method = $this->method;
+
+		if ($method == 'post') {
+			if (isset($this->request->put)) {
+				$method = 'put';
+			} else if (isset($this->request->delete)) {
+				$method = 'delete';
+			} else if (isset($this->request->_method)) {
+				$method = strtolower($this->request->_method);
+			} else if (isset($_SERVER['X-HTTP-Method-Override'])) {
+				$method = strtolower($_SERVER['X-HTTP-Method-Override']);
+			}
 		}
-		if (isset($this->request->delete)) {
-			return 'delete';
-		}
-		return $this->method;
+
+		return $method;
 	}
 }
 
