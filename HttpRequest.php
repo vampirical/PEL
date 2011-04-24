@@ -42,14 +42,14 @@ class HttpRequest
 
 	public $body;
 
-	public function __construct()
+	public function __construct($requestUri = null)
 	{
 		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
 		// Protocol may be overriden by url later
 		$this->protocol = (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https' : 'http';
 
 		$this->host = $_SERVER['HTTP_HOST'];
-		$requestUri = $_SERVER['REQUEST_URI'];
+		$requestUri = ($requestUri === null) ? $_SERVER['REQUEST_URI'] : $requestUri;
 		if (preg_match('/^(?:https?:\/\/)?'. $this->host .'/', $requestUri)) { // Full url in REQUEST_URI
 			if (preg_match('/^(https?):\/\//', $requestUri, $matches)) {
 				$this->protocol = $matches[1];
