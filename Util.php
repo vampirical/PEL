@@ -155,6 +155,35 @@ class Util
 		return $dec;
 	}
 
+	public static function base62($n) {
+		$outputChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		$base = strlen($outputChars);
+		$output = '';
+		while ($n > 0) {
+			$output = substr($outputChars, ($n % $base), 1) . $output;
+			$n = floor($n / $base);
+		}
+		return $output;
+	}
+
+	public static function randomBase62($length) {
+		$retVal = ''; 
+		while (strlen($retVal) < $length) { 
+			$nextChar = mt_rand(0, 61); // 10 digits + 26 uppercase + 26 lowercase = 62 chars
+			if (($nextChar >=10) && ($nextChar < 36)) { // uppercase letters
+				$nextChar -= 10; 
+				$nextChar = chr($nextChar + 65); // ord('A') == 65
+			} else if ($nextChar >= 36) { // lowercase letters
+				$nextChar -= 36; 
+				$nextChar = chr($nextChar + 97); // ord('a') == 97
+			} else { // 0-9
+				$nextChar = chr($nextChar + 48); // ord('0') == 48
+			} 
+			$retVal .= $nextChar; 
+		} 
+		return $retVal; 
+	}
+
 	public static function strlcs($str1, $str2) {
 		$str1Len = strlen($str1);
 		$str2Len = strlen($str2);
