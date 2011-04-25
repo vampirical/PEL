@@ -46,6 +46,23 @@ class Util
 	}
 
 	/**
+         * Camel case a string
+         *
+         * Camel case a string by uppercasing after whitespace and then removing whitespace.
+	 * Standard whitespace: space, form-feed, newline, carriage return, horizontal tab, and vertical tab
+	 * Default additionalWhitespace: hyphen (-), underscore (_)
+         *
+         * @param string $string
+         * @param array  $additionalWhitespace Additional strings which should be treated as whitespace
+         *
+         * @return string
+         */
+        public static function camelCase($string, $additionalWhitespace = array('-', '_'))
+        {
+		return preg_replace('/\s/', '', ucwords(str_replace($additionalWhitespace, ' ', $string)));
+        }
+
+	/**
 	 * Convert Simple XML to a nicely formatted XML string
 	 *
 	 * @param \SimpleXMLElement $sxml
