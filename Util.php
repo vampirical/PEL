@@ -61,6 +61,35 @@ class Util
         {
 		return preg_replace('/\s/', '', ucwords(str_replace($additionalWhitespace, ' ', $string)));
         }
+	
+	/**
+         * Remove camel casing from a string
+         *
+         * Removing camel casing from a string by inserting a separator character before uppercased characters.
+	 * Default separatorCharacter: space ( )
+         *
+         * @param string $string
+         * @param array  $separatorCharacter Defaults to a single space ' '
+         *
+         * @return string
+         */
+	public static function removeCamelCase($string, $separatorCharacter = ' ')
+	{
+		$chars = str_split($string, 1);
+		for ($i = 0, $l = count($chars); $i < $l; $i++) {
+			$char = $chars[$i];
+			if ($char == strtoupper($char)) {
+				$replacementArray = array();
+				if ($i > 0) {
+					$replacementArray[] = $separatorCharacter;
+				}
+				$replacementArray[] = strtolower($char);
+				array_splice($chars, $i, 1, $replacementArray);
+				$i++;
+			}
+		}
+		return implode('', $chars);
+        }
 
 	/**
 	 * Convert Simple XML to a nicely formatted XML string
