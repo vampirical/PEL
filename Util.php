@@ -78,7 +78,7 @@ class Util
 		$chars = str_split($string, 1);
 		for ($i = 0, $l = count($chars); $i < $l; $i++) {
 			$char = $chars[$i];
-			if ($char == strtoupper($char)) {
+			if (ctype_upper($char)) {
 				$replacementArray = array();
 				if ($i > 0) {
 					$replacementArray[] = $separatorCharacter;
