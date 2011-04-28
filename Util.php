@@ -11,8 +11,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function slashify($string)
-	{
+	public static function slashify($string) {
 		$lastChar = substr($string, -1);
 		if ($lastChar != '/' && $lastChar != '\\') {
 			$string .= '/';
@@ -29,8 +28,7 @@ class Util
 	*
 	* @return array
 	*/
-	public static function arrayValuesToAssoc($input)
-	{
+	public static function arrayValuesToAssoc($input) {
 		$output = array();
 
 		$inputValues = array_values($input);
@@ -46,35 +44,33 @@ class Util
 	}
 
 	/**
-         * Camel case a string
-         *
-         * Camel case a string by uppercasing after whitespace and then removing whitespace.
-	 * Standard whitespace: space, form-feed, newline, carriage return, horizontal tab, and vertical tab
-	 * Default additionalWhitespace: hyphen (-), underscore (_)
-         *
-         * @param string $string
-         * @param array  $additionalWhitespace Additional strings which should be treated as whitespace
-         *
-         * @return string
-         */
-        public static function camelCase($string, $additionalWhitespace = array('-', '_'))
-        {
+	* Camel case a string
+	*
+	* Camel case a string by uppercasing after whitespace and then removing whitespace.
+	* Standard whitespace: space, form-feed, newline, carriage return, horizontal tab, and vertical tab
+	* Default additionalWhitespace: hyphen (-), underscore (_)
+	*
+	* @param string $string
+	* @param array  $additionalWhitespace Additional strings which should be treated as whitespace
+	*
+	* @return string
+	*/
+	public static function camelCase($string, $additionalWhitespace = array('-', '_')) {
 		return preg_replace('/\s/', '', ucwords(str_replace($additionalWhitespace, ' ', $string)));
-        }
-	
+	}
+
 	/**
-         * Remove camel casing from a string
-         *
-         * Removing camel casing from a string by inserting a separator character before uppercased characters.
-	 * Default separatorCharacter: space ( )
-         *
-         * @param string $string
-         * @param array  $separatorCharacter Defaults to a single space ' '
-         *
-         * @return string
-         */
-	public static function removeCamelCase($string, $separatorCharacter = ' ')
-	{
+	* Remove camel casing from a string
+	*
+	* Removing camel casing from a string by inserting a separator character before uppercased characters.
+	* Default separatorCharacter: space ( )
+	*
+	* @param string $string
+	* @param array  $separatorCharacter Defaults to a single space ' '
+	*
+	* @return string
+	*/
+	public static function removeCamelCase($string, $separatorCharacter = ' ') {
 		$chars = str_split($string, 1);
 		for ($i = 0, $l = count($chars); $i < $l; $i++) {
 			$char = $chars[$i];
@@ -89,7 +85,7 @@ class Util
 			}
 		}
 		return implode('', $chars);
-        }
+	}
 
 	/**
 	 * Convert Simple XML to a nicely formatted XML string
@@ -99,8 +95,7 @@ class Util
 	 * @throws Exception
 	 * @return string
 	 */
-	public static function sxmlToXml(\SimpleXMLElement $sxml)
-	{
+	public static function sxmlToXml(\SimpleXMLElement $sxml) {
 		if (!($sxml instanceof \SimpleXMLElement)) {
 			throw new Exception('Invalid argument $sxml, \SimpleXMLElement expected.');
 		}
@@ -113,7 +108,7 @@ class Util
 
 		return $doc->saveXML();
 	}
-	
+
 	/**
 	 * Merge two \SimpleXMLElements
 	 *
@@ -123,8 +118,7 @@ class Util
 	 * @throws Exception
 	 * @return \SimpleXMLElement
 	 */
-	public static function sxmlMerge(\SimpleXMLElement $sxmlBase, \SimpleXMLElement $sxmlMerge)
-	{
+	public static function sxmlMerge(\SimpleXMLElement $sxmlBase, \SimpleXMLElement $sxmlMerge) {
 		if (!($sxmlBase instanceof \SimpleXMLElement)) {
 			throw new TPP_Exception('Invalid argument $sxmlBase, \SimpleXMLElement expected.');
 		}
@@ -168,7 +162,7 @@ class Util
 		$len = strlen($str);
 		$dec = '';
 		for ($i = 0; $i < $len; $i += 2) {
-			$c = ($be) ? ord($str[$i]) << 8 | ord($str[$i + 1]) : 
+			$c = ($be) ? ord($str[$i]) << 8 | ord($str[$i + 1]) :
 			ord($str[$i + 1]) << 8 | ord($str[$i]);
 			if ($c >= 0x0001 && $c <= 0x007F) {
 				$dec .= chr($c);
@@ -196,34 +190,62 @@ class Util
 	}
 
 	public static function randomBase62($length) {
-		$retVal = ''; 
-		while (strlen($retVal) < $length) { 
+		$retVal = '';
+		while (strlen($retVal) < $length) {
 			$nextChar = mt_rand(0, 61); // 10 digits + 26 uppercase + 26 lowercase = 62 chars
 			if (($nextChar >=10) && ($nextChar < 36)) { // uppercase letters
-				$nextChar -= 10; 
+				$nextChar -= 10;
 				$nextChar = chr($nextChar + 65); // ord('A') == 65
 			} else if ($nextChar >= 36) { // lowercase letters
-				$nextChar -= 36; 
+				$nextChar -= 36;
 				$nextChar = chr($nextChar + 97); // ord('a') == 97
 			} else { // 0-9
 				$nextChar = chr($nextChar + 48); // ord('0') == 48
-			} 
-			$retVal .= $nextChar; 
-		} 
-		return $retVal; 
+			}
+			$retVal .= $nextChar;
+		}
+		return $retVal;
+	}
+
+	public static function uuidV4() {
+		$uuid = sprintf(
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			// 32 bits for "time_low"
+			mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+			// 16 bits for "time_mid"
+			mt_rand(0, 0xffff),
+			// 16 bits for "time_hi_and_version",
+			// four most significant bits holds version number 4
+			mt_rand(0, 0x0fff) | 0x4000,
+			// 16 bits, 8 bits for "clk_seq_hi_res",
+			// 8 bits for "clk_seq_low",
+			// two most significant bits holds zero and one for variant DCE1.1
+			mt_rand(0, 0x3fff) | 0x8000,
+			// 48 bits for "node"
+			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+		);
+		return $uuid;
+	}
+
+	public static function encodeRfc3986($string) {
+		$string = rawurlencode($string);
+		if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300) {
+			$string = str_replace('%7E', '~', $string);
+		}
+		return $string;
 	}
 
 	public static function strlcs($str1, $str2) {
 		$str1Len = strlen($str1);
 		$str2Len = strlen($str2);
 		$ret = array();
-	 
+
 		if($str1Len == 0 || $str2Len == 0)
 			return $ret; //no similarities
-	 
+
 		$CSL = array(); //Common Sequence Length array
 		$intLargestSize = 0;
-	 
+
 		//initialize the CSL array to assume there are no similarities
 		for($i=0; $i<$str1Len; $i++){
 			$CSL[$i] = array();
@@ -231,7 +253,7 @@ class Util
 				$CSL[$i][$j] = 0;
 			}
 		}
-	 
+
 		for($i=0; $i<$str1Len; $i++){
 			for($j=0; $j<$str2Len; $j++){
 				//check every combination of characters
@@ -239,14 +261,14 @@ class Util
 					//these are the same in both strings
 					if($i == 0 || $j == 0)
 						//it's the first character, so it's clearly only 1 character long
-						$CSL[$i][$j] = 1; 
+						$CSL[$i][$j] = 1;
 					else
 						//it's one character longer than the string from the previous character
-						$CSL[$i][$j] = $CSL[$i-1][$j-1] + 1; 
-	 
+						$CSL[$i][$j] = $CSL[$i-1][$j-1] + 1;
+
 					if( $CSL[$i][$j] > $intLargestSize ){
 						//remember this as the largest
-						$intLargestSize = $CSL[$i][$j]; 
+						$intLargestSize = $CSL[$i][$j];
 						//wipe any previous results
 						$ret = array();
 						//and then fall through to remember this new value
