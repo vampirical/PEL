@@ -1,5 +1,6 @@
 <?php
 
+require_once 'Uuid.php';
 require_once 'Util.php';
 require_once 'SuperGlobalWrapper.php';
 require_once 'Cookie.php';
