@@ -40,7 +40,7 @@ class HttpRequest
 	public $acceptEncoding;
 	public $acceptCharset;
 
-	public $body;
+	protected $body;
 
 	public function __construct($requestUri = null)
 	{
