@@ -18,7 +18,7 @@ class HttpRequest
 {
 	public $url;
 	public $method;
-	
+
 	public $protocol;
 	public $host;
 	public $path;
@@ -26,7 +26,7 @@ class HttpRequest
 	public $dir;
 	public $file;
 	public $extension;
-	
+
 	public $dirParts;
 
 	public $get;
@@ -46,7 +46,7 @@ class HttpRequest
 	{
 		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
 		// Protocol may be overriden by url later
-		$this->protocol = (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https' : 'http';
+		$this->protocol = ($this->ssl()) ? 'https' : 'http';
 
 		$this->host = $_SERVER['HTTP_HOST'];
 		$requestUri = ($requestUri === null) ? $_SERVER['REQUEST_URI'] : $requestUri;
@@ -90,6 +90,11 @@ class HttpRequest
 		if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) $this->acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
 		if (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) $this->acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
 		if (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) $this->acceptCharset = $_SERVER['HTTP_ACCEPT_CHARSET'];
+	}
+
+	public function ssl()
+	{
+		return (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on');
 	}
 
 	public function getBody()
