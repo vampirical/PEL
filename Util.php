@@ -100,7 +100,7 @@ class Util
 			throw new Exception('Invalid argument $sxml, \SimpleXMLElement expected.');
 		}
 
-		$doc = new DOMDocument();
+		$doc = new \DOMDocument();
 		$doc->formatOutput = true;
 		$simpleNode = dom_import_simplexml($sxml);
 		$simpleNode = $doc->importNode($simpleNode, true);
