@@ -39,6 +39,7 @@ class HttpRequest
 	public $acceptLanguage;
 	public $acceptEncoding;
 	public $acceptCharset;
+	public $contentType;
 
 	protected $body;
 
@@ -90,6 +91,7 @@ class HttpRequest
 		if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) $this->acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
 		if (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) $this->acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
 		if (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) $this->acceptCharset = $_SERVER['HTTP_ACCEPT_CHARSET'];
+		if (isset($_SERVER['HTTP_CONTENT_TYPE'])) $this->contentType = $_SERVER['HTTP_CONTENT_TYPE'];
 	}
 
 	public function ssl()
