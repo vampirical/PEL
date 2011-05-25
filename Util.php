@@ -109,6 +109,26 @@ class Util
 		return $doc->saveXML();
 	}
 
+	public static function sxmlToArray($xml) {
+		if (get_class($xml) == 'SimpleXMLElement') {
+			$attributes = $xml->attributes();
+			foreach ($attributes as $k => $v) {
+				if ($v) $a[$k] = (string) $v;
+			}
+			$x = $xml;
+			$xml = get_object_vars($xml);
+		}
+		if (is_array($xml)) {
+			if (count($xml) == 0) return (string) $x;
+			foreach ($xml as $key => $value) {
+				$r[$key] = self::sxmlToArray($value);
+			}
+			if (isset($a)) $r['@attributes'] = $a;
+			return $r;
+		}
+		return (string) $xml;
+	}
+
 	/**
 	 * Merge two \SimpleXMLElements
 	 *
