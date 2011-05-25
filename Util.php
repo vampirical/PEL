@@ -110,7 +110,7 @@ class Util
 	}
 
 	public static function sxmlToArray($xml) {
-		if (get_class($xml) == 'SimpleXMLElement') {
+		if ($xml instanceof SimpleXMLElement) {
 			$attributes = $xml->attributes();
 			foreach ($attributes as $k => $v) {
 				if ($v) $a[$k] = (string) $v;
