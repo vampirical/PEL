@@ -49,7 +49,7 @@ class HttpRequest
 		// Protocol may be overriden by url later
 		$this->protocol = ($this->ssl()) ? 'https' : 'http';
 
-		$this->host = $_SERVER['HTTP_HOST'];
+		$this->host = (isset($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
 		$requestUri = ($requestUri === null) ? $_SERVER['REQUEST_URI'] : $requestUri;
 		if (preg_match('/^(?:https?:\/\/)?'. $this->host .'/', $requestUri)) { // Full url in REQUEST_URI
 			if (preg_match('/^(https?):\/\//', $requestUri, $matches)) {
