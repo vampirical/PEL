@@ -35,6 +35,10 @@ class Session extends SuperGlobalWrapper
 		}
 	}
 
+	public function regenerateId() {
+		return session_regenerate_id(true);
+	}
+
 	public function destroy()
 	{
 		$_SESSION = array();
@@ -85,7 +89,7 @@ class Session extends SuperGlobalWrapper
 		$this->ensureStarted();
 		return parent::__set($variable, $value);
 	}
-	
+
 	public function __isset($variable)
 	{
 		$this->ensureStarted();
