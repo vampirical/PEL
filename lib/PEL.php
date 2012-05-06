@@ -1,15 +1,15 @@
 <?php
 
-require_once 'Uuid.php';
-require_once 'Util.php';
-require_once 'SuperGlobalWrapper.php';
-require_once 'Cookie.php';
-require_once 'Get.php';
-require_once 'Post.php';
-require_once 'Request.php';
-require_once 'Server.php';
-require_once 'Session.php';
-require_once 'HttpRequest.php';
+require_once __DIR__ .'/PEL/Uuid.php';
+require_once __DIR__ .'/PEL/Util.php';
+require_once __DIR__ .'/PEL/SuperGlobalWrapper.php';
+require_once __DIR__ .'/PEL/Cookie.php';
+require_once __DIR__ .'/PEL/Get.php';
+require_once __DIR__ .'/PEL/Post.php';
+require_once __DIR__ .'/PEL/Request.php';
+require_once __DIR__ .'/PEL/Server.php';
+require_once __DIR__ .'/PEL/Session.php';
+require_once __DIR__ .'/PEL/HttpRequest.php';
 
 /**
  * PHP Extended Library
