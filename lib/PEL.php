@@ -1,16 +1,11 @@
 <?php
 
-require_once __DIR__ .'/PEL/Uuid.php';
-require_once __DIR__ .'/PEL/Util.php';
-require_once __DIR__ .'/PEL/Data.php';
-require_once __DIR__ .'/PEL/SuperGlobalWrapper.php';
-require_once __DIR__ .'/PEL/Cookie.php';
-require_once __DIR__ .'/PEL/Get.php';
-require_once __DIR__ .'/PEL/Post.php';
-require_once __DIR__ .'/PEL/Request.php';
-require_once __DIR__ .'/PEL/Server.php';
-require_once __DIR__ .'/PEL/Session.php';
-require_once __DIR__ .'/PEL/HttpRequest.php';
+spl_autoload_register(function($classname) {
+  if( strpos($classname, 'PEL\\') === 0 ) {
+    require __DIR__ . '/' . str_replace('\\', '/', $classname) . '.php';
+  }
+});
+
 
 /**
  * PHP Extended Library

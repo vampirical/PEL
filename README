@@ -1,1 +1,7 @@
-placeholder
+To create a phar archive of this repo, run: make
+
+you can then copy the phar archive to your own project and include it like so:
+
+include 'phar://' . __DIR__ . '/vendor/PEL.phar';
+
+All the sub-classes will be included automagically.
