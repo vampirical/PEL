@@ -2,6 +2,7 @@
 
 require_once __DIR__ .'/PEL/Uuid.php';
 require_once __DIR__ .'/PEL/Util.php';
+require_once __DIR__ .'/PEL/Data.php';
 require_once __DIR__ .'/PEL/SuperGlobalWrapper.php';
 require_once __DIR__ .'/PEL/Cookie.php';
 require_once __DIR__ .'/PEL/Get.php';

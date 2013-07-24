@@ -285,6 +285,31 @@ class Util
 		//return the list of matches
 		return $ret;
 	}
+	
+	public static function stripSlashes( $value ){
+	  static $strip;
+	  if( isset( $strip ) ) return $strip( $value );
+    $strip = function( $value ) use( & $strip ) {
+      if ( is_array($value) ) {
+        return array_map(
+              $strip,
+              array_combine(
+                array_map($strip,array_keys($value)),
+                array_values($value)
+              )
+            ); 
+      } elseif ( is_object($value) ) {
+        $vars = get_object_vars( $value );
+        foreach ($vars as $key=>$data) {
+          $value->{$key} = $strip( $data );
+        }
+      } elseif ( is_string( $value ) ) {
+        $value = stripslashes($value);
+      }
+      return $value;
+    };
+    return $strip( $value );
+	}
 }
 
 ?>
