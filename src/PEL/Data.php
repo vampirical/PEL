@@ -17,37 +17,49 @@ namespace PEL;
 class Data implements \Iterator, \Countable
 {
 	/**
-	 * data reference
+	 * Interla data storage
 	 *
 	 * @var array
 	 */
 	protected $data = array();
 
 	/**
-	 * set up the object
+	 * Set up the object
 	 *
-	 * @param array $data
+	 * @uses load()
+	 *
+	 * @param array|Traversable $input
 	 */
-	public function __construct( array $input = NULL )
+	public function __construct($input = null)
 	{
-		$this->load( $input );
+		$this->load($input);
 	}
-	
-  public function export()
-  {
-      return $this->data;
-  }
 
-  public function load( $input )
-  {
-      if( $input === NULL ) return;
-    
-      if( is_array( $input ) || $input instanceof \Iterator ) {
-          foreach( $input as $k=>$v ) $this->__set( $k, $v);
-      }
-      // all done.
-  }
-    
+	public function export()
+	{
+		return $this->data;
+	}
+
+	/**
+	 * Load data
+	 *
+	 * @param	array|Traversable	$input
+	 *
+	 * @return void
+	 */
+	public function load($input)
+	{
+		if ($input === null) {
+			return;
+		}
+
+		if (is_array($input) || $input instanceof \Traversable) {
+			foreach ($input as $k => $v) {
+				$this->__set($k, $v);
+			}
+		}
+	}
+
 	/**
 	 * Strip slashes from data
 	 */
@@ -139,7 +151,7 @@ class Data implements \Iterator, \Countable
 	 */
 	public function valid()
 	{
-		return ($this->key() !== NULL);
+		return ($this->key() !== null);
 	}
 
 	/**
@@ -149,83 +161,105 @@ class Data implements \Iterator, \Countable
 	{
 		return count($this->data);
 	}
-	
+
 	/**
-	 * see http://php.net/each
+	 * @see http://php.net/each
 	 */
-	public function each(){
+	public function each()
+	{
 		$key = $this->key();
-		if( $key === NULL ) return FALSE;
+		if ($key === null) {
+			return false;
+		}
 		$this->next();
-		return array( $key, $this->get($key) );
+
+		return array($key, $this->__get($key));
 	}
 
- 
 	/**
 	 * @see http://www.php.net/manual/en/function.array-keys.php
-	 **/
-	public function keys(){
+	 */
+	public function keys()
+	{
 		$args = func_get_args();
-		if( count($args) < 1 ) return array_keys( $this->data);
-		$search = array_shift( $args );
-		$strict = array_shift( $args );
-		return array_keys( $this->data, $search, $strict);
+		if (count($args) < 1) {
+			return array_keys($this->data);
+		}
+		$search = array_shift($args);
+		$strict = array_shift($args);
+		return array_keys($this->data, $search, $strict);
 	}
 
 	/**
 	 * @see http://www.php.net/manual/en/function.array-push.php
-	 **/
-	public function push($v){
-		return array_push($this->data, $v );
+	 */
+	public function push($v)
+	{
+		return array_push($this->data, $v);
 	}
 
 	/**
 	 * @see http://www.php.net/manual/en/function.array-pop.php
-	 **/
-	public function pop(){
+	 */
+	public function pop()
+	{
 		return array_pop($this->data);
 	}
 
 	/**
 	 * @see http://www.php.net/manual/en/function.array-shift.php
-	 **/
-	public function shift(){
+	 */
+	public function shift()
+	{
 		return array_shift($this->data);
 	}
 
 	/**
 	 * @see http://www.php.net/manual/en/function.array-unshift.php
-	 **/
-	public function unshift($v){
-		return array_unshift( $this->data, $v );
+	 */
+	public function unshift($v)
+	{
+		return array_unshift($this->data, $v);
 	}
 
 	/**
 	 * @see http://www.php.net/manual/en/function.asort.php
-	 **/
-	public function sort($sort_flags = NULL){
-		return asort($this->data, $sort_flags );
+	 */
+	public function sort($sortFlags = null)
+	{
+		return asort($this->data, $sortFlags);
 	}
 
 	/**
 	 * @see http://www.php.net/manual/en/function.arsort.php
-	 **/
-	public function rsort($sort_flags = NULL){
-		return arsort($this->data, $sort_flags );
+	 */
+	public function rsort($sortFlags = null)
+	{
+		return arsort($this->data, $sortFlags);
 	}
 
 	/**
 	 * @see http://www.php.net/manual/en/function.ksort.php
-	 **/
-	public function ksort($sort_flags = NULL){
-		return ksort($this->data, $sort_flags);
+	 */
+	public function ksort($sortFlags = null)
+	{
+		return ksort($this->data, $sortFlags);
 	}
 
 	/**
 	 * @see http://www.php.net/manual/en/function.ksort.php
-	 **/
-	public function krsort($sort_flags = NULL){
-		return krsort($this->data, $sort_flags);
+	 */
+	public function krsort($sortFlags = null)
+	{
+		return krsort($this->data, $sortFlags);
+	}
+
+	/**
+	 * @see http://php.net/manual/en/function.uasort.php
+	 */
+	public function usort(callable $comparisonFunction)
+	{
+		return uasort($this->data, $comparisonFunction);
 	}
 }
 

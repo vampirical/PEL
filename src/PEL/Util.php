@@ -88,6 +88,28 @@ class Util
 	}
 
 	/**
+	 * Strip slashes recursively
+	 *
+	 * @param	mixed $value
+	 *
+	 * @return mixed
+	 */
+	public static function stripSlashes($value)
+	{
+		if (is_array($value)) {
+			$value = array_map(array(__CLASS__, 'stripSlashes'), $value);
+		} else if (is_object($value)) {
+			foreach ($value as &$subValue) {
+				$subValue = self::stripSlashes($subValue);
+			}
+		} else {
+			$value = stripslashes($value);
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Convert Simple XML to a nicely formatted XML string
 	 *
 	 * @param \SimpleXMLElement $sxml
@@ -284,31 +306,6 @@ class Util
 		}
 		//return the list of matches
 		return $ret;
-	}
-	
-	public static function stripSlashes( $value ){
-	  static $strip;
-	  if( isset( $strip ) ) return $strip( $value );
-    $strip = function( $value ) use( & $strip ) {
-      if ( is_array($value) ) {
-        return array_map(
-              $strip,
-              array_combine(
-                array_map($strip,array_keys($value)),
-                array_values($value)
-              )
-            ); 
-      } elseif ( is_object($value) ) {
-        $vars = get_object_vars( $value );
-        foreach ($vars as $key=>$data) {
-          $value->{$key} = $strip( $data );
-        }
-      } elseif ( is_string( $value ) ) {
-        $value = stripslashes($value);
-      }
-      return $value;
-    };
-    return $strip( $value );
 	}
 }
 

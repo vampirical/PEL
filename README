@@ -1,7 +1,20 @@
-To create a phar archive of this repo, run: make
+PHP Extended Library
+=========================
 
-you can then copy the phar archive to your own project and include it like so:
+Composer
+-------------------------
 
-include 'phar://' . __DIR__ . '/vendor/PEL.phar';
+{
+	"require": {
+		"pel/pel": "*"
+	}
+}
 
-All the sub-classes will be included automagically.
+PHAR
+-------------------------
+
+To create a phar archive of this repo, run:
+make
+
+You can then copy the phar archive to your own project and include it like so:
+include 'phar://path/to/PEL.phar';

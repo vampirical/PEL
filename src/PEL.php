@@ -1,8 +1,8 @@
 <?php
 
-spl_autoload_register(function($classname) {
-  if( strpos($classname, 'PEL\\') === 0 ) {
-    require __DIR__ . '/' . str_replace('\\', '/', $classname) . '.php';
+spl_autoload_register(function($className) {
+  if (strpos($className, 'PEL\\') === 0) {
+    require __DIR__ .'/'. str_replace('\\', '/', $className) . '.php';
   }
 });
 
@@ -18,7 +18,7 @@ class PEL
 	protected static $request;
 	protected static $server;
 	protected static $session;
-	
+
 	public static function cookie($key = null)
 	{
 		if (!isset(self::$cookie)) {
@@ -34,7 +34,7 @@ class PEL
 		}
 		return ($key === null) ? self::$get : self::$get->$key;
 	}
-	
+
 	public static function post($key = null)
 	{
 		if (!isset(self::$post)) {
@@ -42,7 +42,7 @@ class PEL
 		}
 		return ($key === null) ? self::$post : self::$post->$key;
 	}
-	
+
 	public static function request($key = null)
 	{
 		if (!isset(self::$request)) {
@@ -50,7 +50,7 @@ class PEL
 		}
 		return ($key === null) ? self::$request : self::$request->$key;
 	}
-	
+
 	public static function server($key = null)
 	{
 		if (!isset(self::$server)) {
@@ -58,7 +58,7 @@ class PEL
 		}
 		return ($key === null) ? self::$server : self::$server->$key;
 	}
-	
+
 	public static function session($key = null)
 	{
 		if (!isset(self::$session)) {

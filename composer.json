@@ -1,0 +1,9 @@
+{
+	"name": "pel/pel",
+	"type": "library",
+	"description": "PHP Extended Library",
+	"license": "MIT",
+	"require": {
+		"php": ">=5.3.0"
+	}
+}
