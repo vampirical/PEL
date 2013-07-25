@@ -6,7 +6,7 @@ Composer
 
 {
 	"require": {
-		"pel/pel": "*"
+		"pel/pel": "dev-master"
 	}
 }
 
