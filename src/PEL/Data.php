@@ -65,7 +65,7 @@ class Data implements \Iterator, \Countable
 	 */
 	public function stripSlashes()
 	{
-		$this->data = Util::stripSlashes($this->data);
+		$this->data = String::stripSlashes($this->data);
 	}
 
 	/**

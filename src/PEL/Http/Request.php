@@ -1,6 +1,6 @@
 <?php
 
-namespace PEL;
+namespace PEL\Http;
 
 /**
  * PEL HTTP Request
@@ -14,24 +14,24 @@ namespace PEL;
  *
  * @package PEL
  */
-class HttpRequest
+class Request
 {
-	public $url;
-	public $method;
+	public $get;
+	public $post;
+	public $request;
+	public $server;
 
+	public $url;
+
+	public $method;
 	public $protocol;
 	public $host;
 	public $path;
 
 	public $dir;
+	public $dirParts;
 	public $file;
 	public $extension;
-
-	public $dirParts;
-
-	public $get;
-	public $post;
-	public $request;
 
 	public $time;
 	public $userAgent;
@@ -45,13 +45,20 @@ class HttpRequest
 
 	public function __construct($requestUri = null)
 	{
-		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
-		// Protocol may be overriden by url later
-		$this->protocol = ($this->ssl()) ? 'https' : 'http';
+		if (!$requestUri) {
+			$requestUri = $this->server->REQUEST_URI;
+		}
 
-		$this->host = (isset($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
-		$requestUri = ($requestUri === null) ? $_SERVER['REQUEST_URI'] : $requestUri;
-		if (preg_match('/^(?:https?:\/\/)?'. $this->host .'/', $requestUri)) { // Full url in REQUEST_URI
+		$this->get = \PEL::get();
+		$this->post = \PEL::post();
+		$this->request = \PEL::request();
+		$this->server = \PEL::server();
+
+		$this->method = strtolower($this->server->REQUEST_METHOD);
+		$this->protocol = ($this->ssl()) ? 'https' : 'http'; // Protocol may be overriden by url later
+		$this->host = ($this->server->HTTP_HOST) ? $this->server->HTTP_HOST : $this->server->SERVER_NAME;
+
+		if (preg_match('/^(?:https?:\/\/)?'. $this->host .'/', $requestUri)) { // Full url, with or without protocol, in $requestUri
 			if (preg_match('/^(https?):\/\//', $requestUri, $matches)) {
 				$this->protocol = $matches[1];
 				$this->url = $requestUri;
@@ -59,7 +66,7 @@ class HttpRequest
 				$this->url = $this->protocol .'://'. $requestUri;
 			}
 			$this->path = parse_url(substr($requestUri, strpos($requestUri, $this->host) + strlen($this->host)), PHP_URL_PATH);
-		} else { // Path only in REQUEST_URI
+		} else { // Path only in $requestUri
 			$this->path = parse_url($requestUri, PHP_URL_PATH);
 			if (strpos($this->path, '/') !== 0) {
 				$this->path = '/'. $this->path;
@@ -75,40 +82,27 @@ class HttpRequest
 				$pathString = substr($pathString, 0, -(strlen($this->extension) + 1));
 			}
 			$lastSlashOffset = strrpos($pathString, '/') + 1;
-			$this->dir = substr($pathString, 0, $lastSlashOffset);
-			$this->file = substr($pathString, $lastSlashOffset);
 
+			$this->dir = substr($pathString, 0, $lastSlashOffset);
 			$this->dirParts = explode('/', trim($this->dir, '/'));
+			$this->file = substr($pathString, $lastSlashOffset);
 		}
 
-		$this->get = new Get();
-		$this->post = new Post();
-		$this->request = new Request();
-
-		if (isset($_SERVER['REQUEST_TIME'])) $this->time = $_SERVER['REQUEST_TIME'];
-		if (isset($_SERVER['HTTP_USER_AGENT'])) $this->userAgent = $_SERVER['HTTP_USER_AGENT'];
-		if (isset($_SERVER['HTTP_ACCEPT'])) $this->accept = $_SERVER['HTTP_ACCEPT'];
-		if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) $this->acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-		if (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) $this->acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
-		if (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) $this->acceptCharset = $_SERVER['HTTP_ACCEPT_CHARSET'];
-		if (isset($_SERVER['HTTP_CONTENT_TYPE'])) $this->contentType = $_SERVER['HTTP_CONTENT_TYPE'];
+		$this->time = $this->server->REQUEST_TIME;
+		$this->userAgent = $this->server->HTTP_USER_AGENT;
+		$this->accept = $this->server->HTTP_ACCEPT;
+		$this->acceptLanguage = $this->server->HTTP_ACCEPT_LANGUAGE;
+		$this->acceptEncoding = $this->server->HTTP_ACCEPT_ENCODING;
+		$this->acceptCharset = $this->server->HTTP_ACCEPT_CHARSET;
+		$this->contentType = $this->server->HTTP_CONTENT_TYPE;
 	}
 
-	public function ssl()
+	public function isSecure()
 	{
 		return (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on');
 	}
 
-	public function getBody()
-	{
-		if (!$this->body) {
-			$this->body = file_get_contents('php://input');
-		}
-
-		return $this->body;
-	}
-
-	public function method()
+	public function getMethod()
 	{
 		$method = $this->method;
 
@@ -125,6 +119,15 @@ class HttpRequest
 		}
 
 		return $method;
+	}
+
+	public function getBody()
+	{
+		if (!$this->body) {
+			$this->body = file_get_contents('php://input');
+		}
+
+		return $this->body;
 	}
 }
 
