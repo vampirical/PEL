@@ -2,6 +2,8 @@
 
 namespace PEL\Db;
 
+use PEL\Db;
+
 /**
  * PEL Db Record
  *
@@ -131,9 +133,9 @@ class Record implements \Iterator
 	 * Used for ensuring that values come back from the db in the expected format.
 	 * Values can either be process locally or on the database side.
 	 *
-	 * @var string|null \PEL\Db::PROCESS_VALUES_LOCAL|\PEL\Db::PROCESS_VALUES_DB|null
+	 * @var string|null Db::PROCESS_VALUES_LOCAL|Db::PROCESS_VALUES_DB|null
 	 */
-	public $processValues = \PEL\Db::PROCESS_VALUES_LOCAL;
+	public $processValues = Db::PROCESS_VALUES_LOCAL;
 
 	/**
 	 * Whether or not database information is loaded
@@ -217,12 +219,12 @@ class Record implements \Iterator
 	/**
 	 * Create a new Record
 	 *
-	 * @param	Connection $dbConnection If an explicit Connection is not provided one will be requested from \PEL\Db, using $connectionName if set.
+	 * @param	Connection $dbConnection If an explicit Connection is not provided one will be requested from Db, using $connectionName if set.
 	 */
 	public function __construct(Connection $dbConnection = null)
 	{
 		if (!$dbConnection) {
-			$dbConnection = \PEL\Db::getConnection(static::$connectionName);
+			$dbConnection = Db::getConnection(static::$connectionName);
 			if (!$dbConnection) {
 				throw new Exception('Unable to find database connection.');
 			}
@@ -230,7 +232,7 @@ class Record implements \Iterator
 		$this->db = $dbConnection;
 
 		// Populate local instance field maps from static::$fields
-		// TODO Cache these by class in \PEL\Db::$recordTypes (or something) and avoid recalculating them each construct.
+		// TODO Cache these by class in Db::$recordTypes (or something) and avoid recalculating them each construct.
 		$flatFields = isset(static::$fields[0]);
 		if ($flatFields) {
 			$this->fieldNames = array_values(static::$fields);
@@ -285,7 +287,7 @@ class Record implements \Iterator
 	protected function logSilentError($error, $data = array())
 	{
 		$this->errorLog[] = array('error' => $error, 'data' => $data);
-		\PEL\Db::logSilentError($error, $data);
+		Db::logSilentError($error, $data);
 	}
 
 	/**
@@ -713,21 +715,21 @@ class Record implements \Iterator
 				$sqlComparison = '= FALSE';
 			} else if ($value === null) {
 				$sqlComparison = 'IS NULL';
-			} else if (is_string($value) && strtoupper($value) === \PEL\Db::VALUE_NOT_NULL) {
+			} else if (is_string($value) && strtoupper($value) === Db::VALUE_NOT_NULL) {
 				$sqlComparison = 'IS NOT NULL';
 			} else if (is_array($value)) {
 				$sqlComparison = 'IN ('. implode(', ', array_fill(0, count($value), '?')) .')';
 				$values = array_merge($values, array_values($value));
 			} else if (is_object($value) && is_callable(array($value, 'getSqlComparison'))) {
 				$comparison = $value->getSqlComparison();
-				if ($comparison == \PEL\Db::COMPARISON_IS_NULL || $comparison == \PEL\Db::COMPARISON_IS_NOT_NULL) {
+				if ($comparison == Db::COMPARISON_IS_NULL || $comparison == Db::COMPARISON_IS_NOT_NULL) {
 					$sqlComparison = $comparison;
-				} else if ($comparison == \PEL\Db::COMPARISON_IN || $comparison == \PEL\Db::COMPARISON_NOT_IN) {
+				} else if ($comparison == Db::COMPARISON_IN || $comparison == Db::COMPARISON_NOT_IN) {
 					if (is_array($value)) {
 						$sqlComparison = $comparison .' ('. implode(', ', array_fill(0, count($value), '?')) .')';
 						$values = array_merge($value, array_values($value));
 					} else {
-						$sqlComparison = ($comparison == \PEL\Db::COMPARISON_NOT_IN) ? \PEL\Db::COMPARISON_NOT_EQUAL : \PEL\Db::COMPARISON_EQUAL;
+						$sqlComparison = ($comparison == Db::COMPARISON_NOT_IN) ? Db::COMPARISON_NOT_EQUAL : Db::COMPARISON_EQUAL;
 						$values[] = $value;
 					}
 				} else {
@@ -760,7 +762,7 @@ class Record implements \Iterator
 		$arguments = func_get_args();
 		// array_unshift($arguments, $this->db);
 
-		$reflectionObject = new ReflectionClass('\PEL\Db\Record\Value');
+		$reflectionObject = new ReflectionClass('Db\Record\Value');
 		return $reflectionObject->newInstanceArgs($arguments);
 	}
 
@@ -772,7 +774,7 @@ class Record implements \Iterator
 	public function getNotNullValue()
 	{
 		if (!$this->notNullValue) {
-			$this->notNullValue = new Record\Value($this->db, null, false, \PEL\Db::COMPARISON_IS_NOT_NULL);
+			$this->notNullValue = new Record\Value($this->db, null, false, Db::COMPARISON_IS_NOT_NULL);
 		}
 
 		return $this->notNullValue;
@@ -841,7 +843,7 @@ class Record implements \Iterator
 	 */
 	public function processFieldFromDb($field, $value)
 	{
-		if ($this->processValues == \PEL\Db::PROCESS_VALUES_LOCAL && isset($this->fieldTypes[$field])) {
+		if ($this->processValues == Db::PROCESS_VALUES_LOCAL && isset($this->fieldTypes[$field])) {
 			$fieldType = $this->fieldTypes[$field];
 			switch ($fieldType) {
 				case 'timestamp':
@@ -863,7 +865,7 @@ class Record implements \Iterator
 	 */
 	public function processFieldForDb($field, $value)
 	{
-		if ($this->processValues == \PEL\Db::PROCESS_VALUES_LOCAL && isset($this->fieldTypes[$field])) {
+		if ($this->processValues == Db::PROCESS_VALUES_LOCAL && isset($this->fieldTypes[$field])) {
 			$fieldType = $this->fieldTypes[$field];
 			switch ($fieldType) {
 				case 'timestamp':
@@ -1012,7 +1014,7 @@ class Record implements \Iterator
 
 			$wherePack = $this->getWherePack($fields);
 
-			if ($this->processValues == \PEL\Db::PROCESS_VALUES_DB) {
+			if ($this->processValues == Db::PROCESS_VALUES_DB) {
 				$dbDriverName = $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
 				$sqlSelectFields = array();
@@ -1803,7 +1805,7 @@ class Record implements \Iterator
 		$fields = array();
 		$fieldNum = 1;
 		foreach ($this->fieldDbNames as $objectFieldName => $dbFieldName) {
-			$fieldType = \PEL\Db::mapType(static::fieldType($objectFieldName), $databaseName);
+			$fieldType = Db::mapType(static::fieldType($objectFieldName), $databaseName);
 			$fieldDefault = $this->fieldDefault($objectFieldName);
 			$fieldAutoString = '';
 			if ($fieldNum == 1) {

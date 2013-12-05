@@ -8,18 +8,20 @@ class ArrayUtil
 	 * Key by values
 	 *
 	 * Keys an array of arrays by values within the arrays.
-	 * If a specified key is not present or has a null value, that array
-	 * will be excluded from the response.
+	 * If a specified key is not present in an array or if it has a null value,
+	 * that array will be excluded from the response.
 	 *
-	 * If you only need to use a single key and are on PHP 5.5+, you may want to
-	 * consider using array_column instead.
+	 * If you only need a single key and are on PHP 5.5+, you may want to consider
+	 * using array_column instead. However, array_column does not deal with
+	 * multiple matches for the same value, overwriting previous matches.
 	 *
 	 * @param array $arraySet
-	 * @param array $keyBy Flat array of keys to use.
+	 * @param array $keyBy           Flat array of keys to use.
+	 * @param bool  $containerArrays Always use an array container even if there is only one result at that path.
 	 *
 	 * @return array
 	 */
-	public static function keyByValues($arraySet, $keyBy)
+	public static function keyByValues($arraySet, $keyBy, $containerArrays = true)
 	{
 		$keyBy = array_values($keyBy);
 		$keyByLength = count($keyBy);
@@ -70,9 +72,9 @@ class ArrayUtil
 			$matchesMaxIndex = count($matches) - 1;
 			for ($i = $matchesMaxIndex; $i >= 0; $i--) {
 				$matchValue = $matches[$i];
-				if ($i === $matchesMaxIndex) {
+				if ($i === $matchesMaxIndex) { // Lowest level
 					$temp[$matchValue] = array($arraySet[$arrayIndex]);
-				} else {
+				} else { // Non-lowest level
 					$oldTemp = $temp;
 					$temp = array(
 						$matchValue => $oldTemp
@@ -82,6 +84,23 @@ class ArrayUtil
 			}
 
 			$keyedArray = array_merge_recursive($keyedArray, $temp);
+		}
+
+		if (!$containerArrays) {
+			// Walk tree and remove container arrays when they only have one element.
+			$trimLevel = $keyByLength - 1;
+			$trim = function (&$array, $currentLevel) use ($trimLevel, &$trim) {
+				foreach ($array as $key => &$value) {
+					if ($currentLevel === $trimLevel) {
+						if (count($value) === 1) {
+							$value = array_pop($value);
+						}
+					} else {
+						$trim($value, $currentLevel + 1);
+					}
+				}
+			};
+			$trim($keyedArray, 0);
 		}
 
 		return $keyedArray;

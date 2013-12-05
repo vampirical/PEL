@@ -2,6 +2,9 @@
 
 namespace PEL\Db;
 
+use PEL\Db;
+use PEL\ArrayUtil;
+
 /**
  * PEL Db Iterator
  *
@@ -152,7 +155,7 @@ class Iterator implements \Iterator
 		}
 
 		if (!$dbConnection) {
-			$dbConnection = \PEL\Db::getConnection();
+			$dbConnection = Db::getConnection();
 			if (!$dbConnection) {
 				throw new Exception('Unable to find database connection');
 			}
@@ -163,7 +166,7 @@ class Iterator implements \Iterator
 		/*
 		$objectClassParent = class_parents($objectClass);
 		if (!isset($objectClassParent['Record'])) {
-			throw new Exception('Object class (' . $this->objectClass . ') must be a \PEL\Db\Record.');
+			throw new Exception('Object class (' . $this->objectClass . ') must be a Db\Record.');
 		}
 		*/
 		$this->objectClass = '\\'. $objectClass; // TODO Better handling of namespaced classes.
@@ -225,7 +228,7 @@ class Iterator implements \Iterator
 	protected function logSilentError($error, $data = array())
 	{
 		$this->errorLog[] = array('error' => $error, 'data' => $data);
-		\PEL\Db::logSilentError($error, $data);
+		Db::logSilentError($error, $data);
 	}
 
 	/**
@@ -313,8 +316,8 @@ class Iterator implements \Iterator
 			throw new Exception('Unable to add where, undefined field "'. $field .'".');
 		}
 
-		if (is_string($value) && strtoupper($value) == \PEL\Db::VALUE_NOT_NULL && $comparison === null) {
-			$comparison = \PEL\Db::COMPARISON_IS_NOT_NULL;
+		if (is_string($value) && strtoupper($value) == Db::VALUE_NOT_NULL && $comparison === null) {
+			$comparison = Db::COMPARISON_IS_NOT_NULL;
 		}
 
 		if (is_string($comparison)) {
@@ -323,38 +326,38 @@ class Iterator implements \Iterator
 		switch ($comparison) {
 			case null:
 			case false:
-			case \PEL\Db::COMPARISON_EQUAL:
+			case Db::COMPARISON_EQUAL:
 				if ($value !== null) {
 					if (is_array($value)) {
-						$sqlComparison = \PEL\Db::COMPARISON_IN;
+						$sqlComparison = Db::COMPARISON_IN;
 						break;
 					}
 
-					$sqlComparison = \PEL\Db::COMPARISON_EQUAL;
+					$sqlComparison = Db::COMPARISON_EQUAL;
 					break;
 				}
-			case \PEL\Db::COMPARISON_IS_NULL:
-				$sqlComparison = \PEL\Db::COMPARISON_IS_NULL;
+			case Db::COMPARISON_IS_NULL:
+				$sqlComparison = Db::COMPARISON_IS_NULL;
 				break;
 
-			case \PEL\Db::COMPARISON_NOT_EQUAL:
+			case Db::COMPARISON_NOT_EQUAL:
 				if ($value !== null) {
-					$sqlComparison = \PEL\Db::COMPARISON_NOT_EQUAL;
+					$sqlComparison = Db::COMPARISON_NOT_EQUAL;
 					break;
 				}
-			case \PEL\Db::COMPARISON_IS_NOT_NULL:
-				$sqlComparison = \PEL\Db::COMPARISON_IS_NOT_NULL;
+			case Db::COMPARISON_IS_NOT_NULL:
+				$sqlComparison = Db::COMPARISON_IS_NOT_NULL;
 				break;
 
-			case \PEL\Db::COMPARISON_GREATER_THAN:
-			case \PEL\Db::COMPARISON_LESS_THAN:
-			case \PEL\Db::COMPARISON_GREATER_EQUAL:
-			case \PEL\Db::COMPARISON_LESS_EQUAL:
-			case \PEL\Db::COMPARISON_LIKE:
-			case \PEL\Db::COMPARISON_ILIKE:
-			case \PEL\Db::COMPARISON_NOT_LIKE:
-			case \PEL\Db::COMPARISON_IN:
-			case \PEL\Db::COMPARISON_NOT_IN:
+			case Db::COMPARISON_GREATER_THAN:
+			case Db::COMPARISON_LESS_THAN:
+			case Db::COMPARISON_GREATER_EQUAL:
+			case Db::COMPARISON_LESS_EQUAL:
+			case Db::COMPARISON_LIKE:
+			case Db::COMPARISON_ILIKE:
+			case Db::COMPARISON_NOT_LIKE:
+			case Db::COMPARISON_IN:
+			case Db::COMPARISON_NOT_IN:
 				$sqlComparison = $comparison;
 				break;
 
@@ -369,12 +372,12 @@ class Iterator implements \Iterator
 		switch ($conjunction) {
 			case null:
 			case false:
-			case \PEL\Db::CONJUNCTION_AND:
-				$sqlConjunction = \PEL\Db::CONJUNCTION_AND;
+			case Db::CONJUNCTION_AND:
+				$sqlConjunction = Db::CONJUNCTION_AND;
 				break;
 
-			case \PEL\Db::CONJUNCTION_OR:
-				$sqlConjunction = \PEL\Db::CONJUNCTION_OR;
+			case Db::CONJUNCTION_OR:
+				$sqlConjunction = Db::CONJUNCTION_OR;
 				break;
 
 			default:
@@ -385,7 +388,7 @@ class Iterator implements \Iterator
 		$this->wheres[] = array('field' => $field, 'value' => $value, 'comparison' => $sqlComparison, 'conjunction' => $sqlConjunction);
 
 		$this->loaded = false;
-		if (($sqlComparison == \PEL\Db::COMPARISON_IN || $sqlComparison == \PEL\Db::COMPARISON_NOT_IN) && empty($value)) {
+		if (($sqlComparison == Db::COMPARISON_IN || $sqlComparison == Db::COMPARISON_NOT_IN) && empty($value)) {
 			$this->unreachable = true;
 		}
 
@@ -430,7 +433,7 @@ class Iterator implements \Iterator
 
 		switch ($where['comparison']) {
 			default:
-			case \PEL\Db::COMPARISON_EQUAL:
+			case Db::COMPARISON_EQUAL:
 				if ($where['value'] === true) {
 					$sqlValue = 'TRUE';
 					break;
@@ -441,11 +444,11 @@ class Iterator implements \Iterator
 					$sqlValue = $this->db->quote($where['value']);
 					break;
 				}
-			case \PEL\Db::COMPARISON_IS_NULL:
+			case Db::COMPARISON_IS_NULL:
 				$sqlValue = '';
 				break;
 
-			case \PEL\Db::COMPARISON_NOT_EQUAL:
+			case Db::COMPARISON_NOT_EQUAL:
 				if ($where['value'] === true) {
 					$sqlValue = 'TRUE';
 					break;
@@ -456,25 +459,25 @@ class Iterator implements \Iterator
 					$sqlValue = $this->db->quote($where['value']);
 					break;
 				}
-			case \PEL\Db::COMPARISON_IS_NOT_NULL:
+			case Db::COMPARISON_IS_NOT_NULL:
 				$sqlValue = '';
 				break;
 
-			case \PEL\Db::COMPARISON_GREATER_THAN:
-			case \PEL\Db::COMPARISON_LESS_THAN:
-			case \PEL\Db::COMPARISON_GREATER_EQUAL:
-			case \PEL\Db::COMPARISON_LESS_EQUAL:
-			case \PEL\Db::COMPARISON_LIKE:
-			case \PEL\Db::COMPARISON_ILIKE:
-			case \PEL\Db::COMPARISON_NOT_LIKE:
+			case Db::COMPARISON_GREATER_THAN:
+			case Db::COMPARISON_LESS_THAN:
+			case Db::COMPARISON_GREATER_EQUAL:
+			case Db::COMPARISON_LESS_EQUAL:
+			case Db::COMPARISON_LIKE:
+			case Db::COMPARISON_ILIKE:
+			case Db::COMPARISON_NOT_LIKE:
 				$sqlValue = $this->db->quote($where['value']);
 				break;
 
-			case \PEL\Db::COMPARISON_IN:
+			case Db::COMPARISON_IN:
 				$sqlValue = '('. join(', ', array_map(array($this->db, 'quote'), (array) $where['value'])) .')';
 				break;
 
-			case \PEL\Db::COMPARISON_NOT_IN:
+			case Db::COMPARISON_NOT_IN:
 				$sqlValue = '('. join(', ', array_map(array($this->db, 'quote'), (array) $where['value'])) .')';
 				break;
 		}
@@ -509,7 +512,7 @@ class Iterator implements \Iterator
 				$cur = $args[$i];
 				if (isset($args[$i + 1])) {
 					$next = strtoupper($args[$i + 1]);
-					if ($next === \PEL\Db::ORDER_DESC || $next === \PEL\Db::ORDER_ASC) {
+					if ($next === Db::ORDER_DESC || $next === Db::ORDER_ASC) {
 						$this->addOrderBy($cur, $next);
 						$i++;
 						continue;
@@ -538,11 +541,11 @@ class Iterator implements \Iterator
 
 		switch (strtoupper(trim($order))) {
 			default:
-			case \PEL\Db::ORDER_ASC:
-				$sqlOrder = \PEL\Db::ORDER_ASC;
+			case Db::ORDER_ASC:
+				$sqlOrder = Db::ORDER_ASC;
 				break;
-			case \PEL\Db::ORDER_DESC:
-				$sqlOrder = \PEL\Db::ORDER_DESC;
+			case Db::ORDER_DESC:
+				$sqlOrder = Db::ORDER_DESC;
 				break;
 		}
 
@@ -803,7 +806,7 @@ class Iterator implements \Iterator
 			}
 
 			if ($keyBy) {
-				$results = \PEL\ArrayUtil::keyByValues($results, $keyBy);
+				$results = ArrayUtil::keyByValues($results, $keyBy);
 			}
 		}
 

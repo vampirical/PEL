@@ -2,6 +2,8 @@
 
 namespace PEL\Db\Record;
 
+use PEL\Db;
+
 /**
  * PEL Db Record Field Value
  *
@@ -90,13 +92,13 @@ class Value
 	public function getDefaultComparisonForValue()
 	{
 		if ($this->value === null) {
-			return \PEL\Db::COMPARISON_IS_NULL;
-		} else if (strtoupper($this->value) === \PEL\Db::VALUE_NOT_NULL) {
-			return \PEL\Db::COMPARISON_IS_NOT_NULL;
+			return Db::COMPARISON_IS_NULL;
+		} else if (strtoupper($this->value) === Db::VALUE_NOT_NULL) {
+			return Db::COMPARISON_IS_NOT_NULL;
 		} else if (is_array($this->value)) {
-			return \PEL\Db::COMPARISON_IN;
+			return Db::COMPARISON_IN;
 		} else {
-			return \PEL\Db::COMPARISON_EQUAL;
+			return Db::COMPARISON_EQUAL;
 		}
 	}
 
@@ -120,11 +122,11 @@ class Value
 		$comparison = (isset($this->comparison)) ? $this->comparison : $this->getDefaultComparisonForValue();
 
 		// Morph explicit equal/not-equal to null comparisons when approriate
-		if ($this->value === null || strtoupper($this->value) === \PEL\Db::VALUE_NOT_NULL) {
-			if ($comparison === \PEL\Db::COMPARISON_EQUAL) {
-				$comparison = \PEL\Db::COMPARISON_IS_NULL;
-			} else if ($comparison === \PEL\Db::COMPARISON_NOT_EQUAL) {
-				$comparison = \PEL\Db::COMPARISON_IS_NOT_NULL;
+		if ($this->value === null || strtoupper($this->value) === Db::VALUE_NOT_NULL) {
+			if ($comparison === Db::COMPARISON_EQUAL) {
+				$comparison = Db::COMPARISON_IS_NULL;
+			} else if ($comparison === Db::COMPARISON_NOT_EQUAL) {
+				$comparison = Db::COMPARISON_IS_NOT_NULL;
 			}
 		}
 
