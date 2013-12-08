@@ -68,6 +68,7 @@ class ArrayUtil
 				continue;
 			}
 
+			/* Bottom-up build
 			$temp = array();
 			$matchesMaxIndex = count($matches) - 1;
 			for ($i = $matchesMaxIndex; $i >= 0; $i--) {
@@ -84,6 +85,18 @@ class ArrayUtil
 			}
 
 			$keyedArray = array_merge_recursive($keyedArray, $temp);
+			*/
+
+			// Top down, in-place build
+			$destination = &$keyedArray;
+			for ($i = 0, $l = count($matches); $i < $l; ++$i) {
+				$iKey = $matches[$i];
+				if (!isset($destination[$iKey])) {
+					$destination[$iKey] = array();
+				}
+				$destination = &$destination[$iKey];
+			}
+			$destination[] = $arraySet[$arrayIndex];
 		}
 
 		if (!$containerArrays) {
