@@ -68,26 +68,6 @@ class ArrayUtil
 				continue;
 			}
 
-			/* Bottom-up build
-			$temp = array();
-			$matchesMaxIndex = count($matches) - 1;
-			for ($i = $matchesMaxIndex; $i >= 0; $i--) {
-				$matchValue = $matches[$i];
-				if ($i === $matchesMaxIndex) { // Lowest level
-					$temp[$matchValue] = array($arraySet[$arrayIndex]);
-				} else { // Non-lowest level
-					$oldTemp = $temp;
-					$temp = array(
-						$matchValue => $oldTemp
-					);
-					unset($oldTemp);
-				}
-			}
-
-			$keyedArray = array_merge_recursive($keyedArray, $temp);
-			*/
-
-			// Top down, in-place build
 			$destination = &$keyedArray;
 			for ($i = 0, $l = count($matches); $i < $l; ++$i) {
 				$iKey = $matches[$i];
