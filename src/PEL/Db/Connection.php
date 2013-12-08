@@ -45,78 +45,9 @@ class Connection extends \PDO
 	protected $cache;
 
 	/**
-	 * Get Data Source Name
-	 *
-	 * @param string $driverName
-	 * @param array $parameters
-	 *
-	 * @return string
-	 */
-	public static function constructDsn($driverName, $parameters = array())
-	{
-		switch ($driverName) {
-			case 'mysql':
-				$dsnString = $driverName .':';
-
-				$validParameters = array('host' => 'host', 'dbname' => 'dbname', 'user' => 'user', 'password' => 'password', 'port' => 'port');
-				$dsnParameters = array();
-				foreach ($validParameters as $validParameter => $dsnParameterKey) {
-					if (!empty($parameters[$validParameter])) {
-						$dsnParameters[$dsnParameterKey] = $parameters[$validParameter];
-					}
-				}
-
-				foreach ($dsnParameters as $dsnParameterKey => $dsnParameterValue) {
-					$dsnString .= $dsnParameterKey .'='. $dsnParameterValue .';';
-				}
-
-				return $dsnString;
-				break;
-
-			case 'pgsql':
-				$dsnString = $driverName .':';
-
-				$validParameters = array('host' => 'host', 'dbname' => 'dbname', 'user' => 'user', 'password' => 'password', 'port' => 'port');
-				$dsnParameters = array();
-				foreach ($validParameters as $validParameter => $dsnParameterKey) {
-					if (!empty($parameters[$validParameter])) {
-						$dsnParameters[$dsnParameterKey] = $parameters[$validParameter];
-					}
-				}
-
-				foreach ($dsnParameters as $dsnParameterKey => $dsnParameterValue) {
-					$dsnString .= $dsnParameterKey .'='. $dsnParameterValue .' ';
-				}
-
-				return $dsnString;
-				break;
-
-			default:
-				throw new Exception('Unsupported database driver, unable to construct DSN.');
-				break;
-		}
-	}
-
-	/**
-	 * Create an instance based on config
-	 *
-	 * @param SimpleXMLElement $config
-	 *
-	 * @return __CLASS__
-	 */
-	public static function createFromConfig(\SimpleXMLElement $config)
-	{
-		$className = __CLASS__;
-		$dsnString = self::constructDsn($config['type'], $config);
-		$instance = new $className($dsnString, $config['user'], $config['password']);
-
-		return $instance;
-	}
-
-	/**
 	 * Connection contructor
 	 *
-	 * @param string $dsn
+	 * @param string $dsn PDO Data Source Name
 	 * @param string $username
 	 * @param string $password
 	 * @param array $options
@@ -233,6 +164,7 @@ class Connection extends \PDO
 				break;
 
 			case 'pgsql':
+			case 'sqlite':
 			default:
 				$this->identifierQuote = '"'; // Standard SQL identifier quote character as specified in the RFC
 			break;
@@ -273,14 +205,17 @@ class Connection extends \PDO
 		if (!$this->dbName) {
 			$driver = $this->getAttribute(\PDO::ATTR_DRIVER_NAME);
 			switch ($driver) {
-				case 'pgsql':
-					$query = 'SELECT CURRENT_DATABASE()';
-					break;
 				case 'mysql':
 					$query = 'SELECT DATABASE()';
 					break;
+				case 'pgsql':
+					$query = 'SELECT CURRENT_DATABASE()';
+					break;
+				case 'sqlite':
+					throw new Exception('SQLite does not support retrieving database name.');
+					break;
 				default:
-					throw new Exception('Unable to determine database name, unsupported driver ('. $driver .').');
+					throw new Exception('Unsupported driver ('. $driver .').');
 					break;
 			}
 

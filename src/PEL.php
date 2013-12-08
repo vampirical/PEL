@@ -7,7 +7,7 @@
  */
 
 
-spl_autoload_register(function($className) {
+spl_autoload_register(function ($className) {
   if (strpos($className, 'PEL\\') === 0) {
     require __DIR__ .'/'. str_replace('\\', '/', $className) . '.php';
   }

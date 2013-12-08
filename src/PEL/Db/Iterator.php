@@ -792,7 +792,7 @@ class Iterator implements \Iterator
 		}
 	}
 
-	public function results($keyBy = null)
+	public function results($keyBy = null, $containerArrays = true)
 	{
 		if (!$this->loaded) {
 			$this->load();
@@ -806,7 +806,7 @@ class Iterator implements \Iterator
 			}
 
 			if ($keyBy) {
-				$results = ArrayUtil::keyByValues($results, $keyBy);
+				$results = ArrayUtil::keyByValues($results, $keyBy, $containerArrays);
 			}
 		}
 

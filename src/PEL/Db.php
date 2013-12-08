@@ -54,6 +54,8 @@ class Db
 	 *
 	 * Log to self::$errorLog and syslog
 	 *
+	 * @uses self::logSilentError()
+	 *
 	 * @param string $error
 	 * @param array  $data
 	 *
@@ -82,7 +84,7 @@ class Db
 
 	public static function createConnection($params, $name = null)
 	{
-		$refClass = new ReflectionClass('Db\Connection');
+		$refClass = new \ReflectionClass('\PEL\Db\Connection');
 		$instance = $refClass->newInstanceArgs($params);
 
 		self::$connections[$name] = $instance;
@@ -90,22 +92,14 @@ class Db
 		return $instance;
 	}
 
-	public static function createConnectionFromConfig(SimpleXMLElement $config, $name = null)
-	{
-		self::$connections[$name] = Db\Connection::createFromConfig($config);
-
-		return self::$connections[$name];
-	}
-
 	public static function registerConnection($params, $name = null)
 	{
 		self::$registeredConnections[$name] = $params;
 	}
 
-	public static function registerConnectionFromConfig(SimpleXMLElement $config)
+	public static function unregisterConnection($name = null)
 	{
-		$name = (!empty($config['name'])) ? (string) $config['name'] : null;
-		self::$registeredConnections[$name] = $config;
+		unset(self::$registeredConnections[$name]);
 	}
 
 	public static function getDefaultConnectionName() {
@@ -127,11 +121,7 @@ class Db
 			$connection = self::$connections[$name];
 		} else if (isset(self::$registeredConnections[$name])) {
 			$registered = self::$registeredConnections[$name];
-			if ($registered instanceof SimpleXMLElement) {
-				$connection = self::createConnectionFromConfig($registered, $name);
-			} else {
-				$connection = self::createConnection($registered, $name);
-			}
+			$connection = self::createConnection($registered, $name);
 		}
 
 		return $connection;
@@ -147,7 +137,7 @@ class Db
 		} else if (is_int($value)) {
 			$type = \PDO::PARAM_INT;
 		} else if (is_double($value)) {
-			$type = \PDO::PARAM_STR; // *sigh* PDO stupidity
+			$type = \PDO::PARAM_STR; // TODO *sigh* PDO stupidity, need to retest every now and again
 		} else if (strlen($value) > 1000) {
 			$type = \PDO::PARAM_LOB;
 		} else if (is_string($value)) {

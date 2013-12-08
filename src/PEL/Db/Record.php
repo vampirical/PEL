@@ -16,7 +16,7 @@ use PEL\Db;
  *
  * @package PEL
  */
-class Record implements \Iterator
+class Record implements \Iterator, \ArrayAccess
 {
 	/**
 	 * Database Connection
@@ -42,7 +42,17 @@ class Record implements \Iterator
 	/**
 	 * Record Fields
 	 *
-	 * objectVariableName => sqlFieldName
+	 * Flat array of field names or objectVariableName => fieldDefinition mapping.
+	 * Field definition must define:
+	 *   type
+	 * Can optionally define:
+	 *   dbField
+	 *   null
+	 *   default
+	 *   auto
+	 *
+	 * When using a flat field specification some functionality is disabled,
+	 * such as value processing (@see processValues).
 	 *
 	 * @var array
 	 */
@@ -762,7 +772,7 @@ class Record implements \Iterator
 		$arguments = func_get_args();
 		// array_unshift($arguments, $this->db);
 
-		$reflectionObject = new ReflectionClass('Db\Record\Value');
+		$reflectionObject = new \ReflectionClass('\PEL\Db\Record\Value');
 		return $reflectionObject->newInstanceArgs($arguments);
 	}
 
@@ -873,8 +883,8 @@ class Record implements \Iterator
 						$isNumeric = is_numeric($value);
 						$dbDriverName = $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME);
 						switch ($dbDriverName) {
-							case 'pgsql':
-								$format = 'r';
+							case 'mysql':
+								$format = 'Y-m-d H:i:s';
 								if ($isNumeric) {
 									$value = gmdate($format, $value);
 								} else {
@@ -882,8 +892,8 @@ class Record implements \Iterator
 									if ($ts) $value = gmdate($format, $ts);
 								}
 								break;
-							case 'mysql':
-								$format = 'Y-m-d H:i:s';
+							case 'pgsql':
+								$format = 'r';
 								if ($isNumeric) {
 									$value = gmdate($format, $value);
 								} else {
@@ -1028,6 +1038,7 @@ class Record implements \Iterator
 								case 'mysql':
 									$sqlSelectField = 'UNIX_TIMESTAMP('. $quotedDbField .') AS '. $selectDbField;
 									break;
+
 								case 'sqlite':
 									$sqlSelectField = 'strftime(\'%s\', '. $quotedDbField .')';
 									break;
@@ -1774,21 +1785,39 @@ class Record implements \Iterator
 		$this->iterPosition = 0;
 	}
 
-	function current() {
+	public function current() {
 		$fieldName = $this->fieldNames[$this->iterPosition];
 		return (isset($this->fieldValues[$fieldName])) ? $this->fieldValues[$fieldName] : null;
 	}
 
-	function key() {
+	public function key() {
 		return $this->fieldNames[$this->iterPosition];
 	}
 
-	function next() {
+	public function next() {
 		++$this->iterPosition;
 	}
 
-	function valid() {
+	public function valid() {
 		return isset($this->fieldNames[$this->iterPosition]);
+	}
+
+	// \ArrayAccess Implementation
+
+	public function offsetExists($offset) {
+		return $this->__isset($offset);
+	}
+
+	public function offsetGet($offset) {
+		return $this->__get($offset);
+	}
+
+	public function offsetSet($offset, $value) {
+		$this->__set($offset, $value);
+	}
+
+	public function offsetUnset($offset) {
+		$this->__unset($offset);
 	}
 
 	// Utilities
