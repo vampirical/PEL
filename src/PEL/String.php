@@ -146,26 +146,95 @@ class String
 		return $dec;
 	}
 
-	// Base62 (upper/lower hex)
+	// Base
+
+	/**
+	 * Convert a number to a base based on a set of characters
+	 *
+	 * @param	int|float $number
+	 * @param string    $characterSet
+	 *
+	 * @return string
+	 */
+	public static function baseConvert($number, $characterSet) {
+		$output = '';
+
+		$base = strlen($characterSet);
+		while ($number > 0) {
+			$output = substr($characterSet, ($number % $base), 1) . $output;
+			$number = floor($number / $base);
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Convert a number to base33 (lower hex excluding zero, i, and o)
+	 *
+	 * @param	int|float $number
+	 *
+	 * @return string
+	 */
+	public static function base33($number) {
+		return self::baseConvert($number, '123456789abcdefghjklmnpqrstuvwxyz');
+	}
+
+	/**
+	 * Convert a number to base36 (lower hex)
+	 *
+	 * @param	int|float $number
+	 *
+	 * @return string
+	 */
+	public static function base36($number) {
+		return self::baseConvert($number, '0123456789abcdefghijklmnopqrstuvwxyz');
+	}
 
 	/**
 	 * Convert a number to base62 (upper/lower hex)
 	 *
-	 * @param	int|float $n
+	 * @param	int|float $number
 	 *
 	 * @return string
 	 */
-	public static function base62($n) {
-		$output = '';
+	public static function base62($number) {
+		return self::baseConvert($number, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	}
 
-		$outputChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		$base = strlen($outputChars);
-		while ($n > 0) {
-			$output = substr($outputChars, ($n % $base), 1) . $output;
-			$n = floor($n / $base);
+	/**
+	 * Create a string of random base33 (lower hex, excluding zero, i, and o) characters
+	 *
+	 * @param	int $length
+	 *
+	 * @return string
+	 */
+	public static function randomBase33($length) {
+		$result = '';
+
+		while (strlen($result) < $length) {
+			$nextChar = mt_rand(0, 32);
+			$result .= self::base33($nextChar);
 		}
 
-		return $output;
+		return $result;
+	}
+
+	/**
+	 * Create a string of random base36 (lower hex) characters
+	 *
+	 * @param	int $length
+	 *
+	 * @return string
+	 */
+	public static function randomBase36($length) {
+		$result = '';
+
+		while (strlen($result) < $length) {
+			$nextChar = mt_rand(0, 35);
+			$result .= self::base36($nextChar);
+		}
+
+		return $result;
 	}
 
 	/**

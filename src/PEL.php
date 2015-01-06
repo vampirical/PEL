@@ -20,12 +20,59 @@ spl_autoload_register(function ($className) {
  */
 class PEL
 {
+	const LOG_DEBUG = 'debug';
+	const LOG_INFO = 'info';
+	const LOG_WARN = 'warn';
+	const LOG_ERROR = 'error';
+	const LOG_ALERT = 'alert';
+
 	protected static $cookie;
 	protected static $get;
 	protected static $post;
 	protected static $request;
 	protected static $server;
 	protected static $session;
+
+	public static function onWindows() {
+		return (strtolower(substr(PHP_OS, 0, 3)) === 'win');
+	}
+
+	public static function log($msg, $level = null) {
+		if ($msg instanceof Exception) {
+			$traceString = $msg->getTraceAsString();
+			$msg = $msg->getMessage() .' in '. $msg->getFile() .':'. $msg->getLine();
+			if ($level == self::LOG_WARN || $level == self::LOG_ERROR || $level == self::LOG_ALERT) {
+				$msg .= "\n". $traceString;
+			}
+		} else if (is_callable(array($msg, '__toString'))) {
+			$msg = $msg->__toString();
+		}
+
+		switch ($level) {
+			default:
+			case self::LOG_DEBUG:
+			case self::LOG_INFO:
+				$syslogPriority = LOG_INFO;
+				break;
+			case self::LOG_WARN:
+				$syslogPriority = LOG_WARNING;
+			case self::LOG_ERROR:
+				$syslogPriority = LOG_ERR;
+			case self::LOG_ALERT:
+				$syslogPriority = LOG_ALERT;
+				break;
+		}
+
+		syslog($syslogPriority, $msg);
+		if (self::onWindows()) {
+			// Since the windows event system is terrible
+			file_put_contents(sys_get_temp_dir() .'/PEL.log', $msg . PHP_EOL, FILE_APPEND);
+		}
+	}
+
+	public static function getLibPath() {
+		return dirname(__DIR__) .'/lib/';
+	}
 
 	public static function cookie($key = null)
 	{
