@@ -1207,6 +1207,11 @@ class Record implements \Iterator, \ArrayAccess
 				}
 			}
 
+			$valuesString = 'DEFAULT VALUES';
+			if ($insertValues) {
+				$valuesString = 'VALUES ('. join(',', array_fill(0, count($insertValues), '?')) .')';
+			}
+
 			$primaryKeyReturnedInStatement = false;
 			$primaryKeyVariablesSet = true;
 			foreach (static::$primaryKeyFields as $primaryKeyVariable) {
@@ -1231,7 +1236,7 @@ class Record implements \Iterator, \ArrayAccess
 
 			$insertQuery = 'INSERT INTO '. $this->db->quoteIdentifier(static::$table) .
 			               ' ('. join(', ', array_map(array($this->db, 'quoteIdentifier'), $insertFields)) .')'.
-										 ' VALUES ('. join(',', array_fill(0, count($insertValues), '?')) .')'. $returningString;
+										 ' '. $valuesString . $returningString;
 			$statement = $this->prepare($insertQuery);
 			for ($i = 0, $l = count($insertValues); $i < $l; $i++) {
 				$this->bindParam($statement, $i + 1, $insertValues[$i]);
