@@ -4,19 +4,26 @@ namespace PEL\Storage;
 
 class S3 extends Provider
 {
+	/**
+	 * Enable debug behavior and logging.
+	 *
+	 * @var bool
+	 */
+	protected $debug = false;
+
 	protected $bucketExists = array();
 
 	protected $s3;
 	protected $bucket;
 
-	public function __construct($accessKey, $secretKey, $bucket) {
+	public function __construct($accessKey, $secretKey, $bucket, $useSsl = false) {
 		if (!function_exists('curl_version')) {
 			throw new Exception('The curl extension is required for PEL\Storage\S3.');
 		}
 
 		require_once \PEL::getLibPath() .'s3-php5-curl/S3.php';
 
-		$this->s3 = new \S3($accessKey, $secretKey);
+		$this->s3 = new \S3($accessKey, $secretKey, $useSsl);
 		$this->bucket = $bucket;
 	}
 
@@ -50,16 +57,31 @@ class S3 extends Provider
 		return ($info !== false);
 	}
 
-	public function put($key, $value) {
+	public function set($key, $value) {
 		$this->ensureBucketExists($this->bucket);
-		$putResult = $this->s3->putObject($value, $this->bucket, $key, \S3::ACL_PRIVATE);
-		return $putResult;
+		$result = $this->s3->putObject($value, $this->bucket, $key, \S3::ACL_PRIVATE);
+		return $result;
 	}
 
-	public function putFile($key, $file) {
+	public function setFile($key, $file) {
+		if ($this->debug) {
+			$start = microtime(true);
+		}
+
 		$this->ensureBucketExists($this->bucket);
-		$putResult = $this->s3->putObject($this->s3->inputFile($file), $this->bucket, $key, \S3::ACL_PRIVATE);
-		return $putResult;
+		if ($this->debug) {
+			\PEL::log('S3 setFile ensure bucket exists time: '. (microtime(true) - $start), \PEL::LOG_DEBUG);
+			$putStart = microtime(true);
+		}
+
+		$result = $this->s3->putObject($this->s3->inputFile($file), $this->bucket, $key, \S3::ACL_PRIVATE);
+		if ($this->debug) {
+			\PEL::log('S3 setFile putObject time: '. (microtime(true) - $putStart), \PEL::LOG_DEBUG);
+
+			\PEL::log('S3 setFile total time: '. (microtime(true) - $start), \PEL::LOG_DEBUG);
+		}
+
+		return $result;
 	}
 
 	public function get($key) {

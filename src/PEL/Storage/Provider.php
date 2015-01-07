@@ -52,7 +52,7 @@ abstract class Provider
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
 	 */
-	abstract public function put($key, $value);
+	abstract public function set($key, $value);
 
 	/**
 	 * Store a value from a stream
@@ -64,7 +64,7 @@ abstract class Provider
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
 	 */
-	//abstract public function putStream($key, $stream);
+	//abstract public function setStream($key, $stream);
 
 	/**
 	 * Store a value from a file
@@ -74,7 +74,7 @@ abstract class Provider
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
 	 */
-	abstract public function putFile($key, $file);
+	abstract public function setFile($key, $file);
 
 	/**
 	 * Get a value by key

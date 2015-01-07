@@ -29,7 +29,7 @@ class Filesystem extends Provider
 		return file_exists($path);
 	}
 
-	public function put($key, $value) {
+	public function set($key, $value) {
 		$path = $this->getKeyPath($key);
 		$pathExists = self::ensurePathExists($path);
 		$filePutResult = @file_put_contents($path, $value);
@@ -48,7 +48,7 @@ class Filesystem extends Provider
 		return $fullyWritten;
 	}
 
-	public function putFile($key, $file) {
+	public function setFile($key, $file) {
 		$path = $this->getKeyPath($key);
 		$pathExists = self::ensurePathExists($path);
 		$result = copy($file, $path);

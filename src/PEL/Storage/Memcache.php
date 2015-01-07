@@ -36,21 +36,14 @@ class Memcache extends Provider
 		return ($m->getResultCode() == Memcached::RES_SUCCESS);
 	}
 
-	public function put($key, $value, $expiration = null) {
+	public function set($key, $value, $expiration = null) {
 		if ($this->m) {
 			return $this->m->set($key, $value, $expiration);
 		}
 		return false;
 	}
 
-	/**
-	 * Compatibility with normal memcache interface.
-	 */
-	public function set($key, $value, $expiration = null) {
-		$this->put($key, $value, $expiration);
-	}
-
-	public function putFile($key, $file, $expiration = null) {
+	public function setFile($key, $file, $expiration = null) {
 		return $this->set($key, file_get_contents($file), $expiration);
 	}
 
