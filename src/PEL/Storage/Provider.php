@@ -5,9 +5,11 @@ namespace PEL\Storage;
 abstract class Provider
 {
 	protected $blacklist = array();
+	protected $readBlacklist = array();
+	protected $writeBlacklist = array();
 
 	/**
-	 * Add a blacklisted regex.
+	 * Add a blacklisted regex, affects both read and writes.
 	 *
 	 * @param	string $regex
 	 *
@@ -18,20 +20,61 @@ abstract class Provider
 	}
 
 	/**
+	 * Add a read only blacklisted regex.
+	 *
+	 * @param	string $regex
+	 *
+	 * @return void
+	 */
+	public function readBlacklist($regex) {
+		$this->readBlacklist[] = $regex;
+	}
+
+	/**
+	 * Add a write only blacklisted regex.
+	 *
+	 * @param	string $regex
+	 *
+	 * @return void
+	 */
+	public function writeBlacklist($regex) {
+		$this->writeBlacklist[] = $regex;
+	}
+
+	/**
 	 * Check whether a key is valid for this provider.
 	 *
 	 * @param	string $key
+	 * @param string $type \PEL\Storage::ACCESS_READ or \PEL\Storage::ACCESS_WRITE, defaults to ACCESS_WRITE
 	 *
 	 * @return bool
 	 */
-	public function allowed($key) {
+	public function allowed($key, $type = \PEL\Storage::ACCESS_WRITE) {
 		$blacklisted = false;
+
 		foreach ($this->blacklist as $blacklistRegex) {
 			if (preg_match($blacklistRegex, $key)) {
 				$blacklisted = true;
 				break;
 			}
 		}
+
+		if ($type === \PEL\Storage::ACCESS_READ) {
+			foreach ($this->readBlacklist as $blacklistRegex) {
+				if (preg_match($blacklistRegex, $key)) {
+					$blacklisted = true;
+					break;
+				}
+			}
+		} else if ($type === \PEL\Storage::ACCESS_WRITE) {
+			foreach ($this->writeBlacklist as $blacklistRegex) {
+				if (preg_match($blacklistRegex, $key)) {
+					$blacklisted = true;
+					break;
+				}
+			}
+		}
+
 		return !$blacklisted;
 	}
 

@@ -32,6 +32,9 @@ namespace PEL;
  */
 class Storage
 {
+	const ACCESS_READ = 'read';
+	const ACCESS_WRITE = 'write';
+
 	/**
 	 * Enable debug behavior and logging.
 	 *
@@ -123,6 +126,11 @@ class Storage
 
 		foreach ($providers as $provider) {
 			if ($checkExists) {
+				// Skip exists check if write isn't allowed.
+				if (!$provider->allowed($key, self::ACCESS_WRITE)) {
+					continue;
+				}
+
 				$exists = $provider->exists($key);
 				if ($this->debug) {
 					\PEL::log('Storage fill, '. get_class($provider) .'->exists('. $key .'): '. (($exists) ? 'true' : 'false'), \PEL::LOG_DEBUG);
@@ -159,7 +167,7 @@ class Storage
 		$backfillProviders = array();
 
 		foreach ($this->providers as $index => $provider) {
-			if (!$provider->allowed($key)) {
+			if (!$provider->allowed($key, self::ACCESS_READ)) {
 				continue;
 			}
 
@@ -257,7 +265,7 @@ class Storage
 		$key = $this->normalizeKey($key);
 
 		foreach ($this->providers as $provider) {
-			if (!$provider->allowed($key)) {
+			if (!$provider->allowed($key, self::ACCESS_READ)) {
 				continue;
 			}
 
@@ -291,7 +299,7 @@ class Storage
 
 		$written = 0;
 		foreach ($this->providers as $provider) {
-			if (!$provider->allowed($key)) {
+			if (!$provider->allowed($key, self::ACCESS_WRITE)) {
 				continue;
 			}
 
@@ -325,7 +333,7 @@ class Storage
 
 		$written = 0;
 		foreach ($this->providers as $provider) {
-			if (!$provider->allowed($key)) {
+			if (!$provider->allowed($key, self::ACCESS_WRITE)) {
 				continue;
 			}
 
@@ -373,7 +381,7 @@ class Storage
 		$key = $this->normalizeKey($key);
 
 		foreach ($this->providers as $provider) {
-			if (!$provider->allowed($key)) {
+			if (!$provider->allowed($key, self::ACCESS_READ)) {
 				continue;
 			}
 
@@ -399,7 +407,7 @@ class Storage
 		$key = $this->normalizeKey($key);
 
 		foreach ($this->providers as $provider) {
-			if (!$provider->allowed($key)) {
+			if (!$provider->allowed($key, self::ACCESS_WRITE)) {
 				continue;
 			}
 
