@@ -297,21 +297,24 @@ class Storage
 	public function set($key, $value, $expiration = null) {
 		$key = $this->normalizeKey($key);
 
+		$allowed = 0;
 		$written = 0;
 		foreach ($this->providers as $provider) {
 			if (!$provider->allowed($key, self::ACCESS_WRITE)) {
 				continue;
 			}
+			++$allowed;
 
 			$result = $provider->set($key, $value, $expiration);
 			if ($this->debug) {
 				\PEL::log('Storage set, '. get_class($provider) .'->set('. $key .', ...): '. $result, \PEL::LOG_DEBUG);
 			}
 			if ($result) {
-				$written++;
+				++$written;
 			}
 		}
-		return ($written == count($this->providers)) ? true : false;
+
+		return ($allowed > 0 && ($written === $allowed));
 	}
 
 	/**
@@ -331,21 +334,24 @@ class Storage
 	public function setFile($key, $file, $expiration = null) {
 		$key = $this->normalizeKey($key);
 
+		$allowed = 0;
 		$written = 0;
 		foreach ($this->providers as $provider) {
 			if (!$provider->allowed($key, self::ACCESS_WRITE)) {
 				continue;
 			}
+			++$allowed;
 
 			$result = $provider->setFile($key, $file, $expiration);
 			if ($this->debug) {
 				\PEL::log('Storage setFile, '. get_class($provider) .'->setFile('. $key .', ...): '. $result, \PEL::LOG_DEBUG);
 			}
 			if ($result) {
-				$written++;
+				++$written;
 			}
 		}
-		return ($written == count($this->providers)) ? true : false;
+
+		return ($allowed > 0 && ($written === $allowed));
 	}
 
 	/**
