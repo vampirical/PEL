@@ -73,7 +73,7 @@ class Filesystem extends Provider
 		return array(
 			'time' => @filemtime($path),
 			'hash' => @md5_file($path),
-			'type' => @mime_content_type($path),
+			'type' => @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path),
 			'size' => @filesize($path)
 		);
 	}
