@@ -51,8 +51,6 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 		$tempFile = self::$s->getTempFile($testKey);
 		$tempFileContent = file_get_contents($tempFile);
 		$this->assertEquals($tempFileContent, $testValue, 'Temp file content does not match test value.');
-
-		usleep(5000000);
 	}
 
 	/**

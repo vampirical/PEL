@@ -91,7 +91,7 @@ class S3 extends Provider
 
 	public function getInfo($key) {
 		$info = @$this->s3->getObjectInfo($this->bucket, $key);
-		return $info;
+		return ($info) ? $info : null;
 	}
 
 	public function delete($key) {

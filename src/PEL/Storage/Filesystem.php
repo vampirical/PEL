@@ -70,12 +70,18 @@ class Filesystem extends Provider
 
 	public function getInfo($key) {
 		$path = $this->getKeyPath($key);
-		return array(
-			'time' => @filemtime($path),
-			'hash' => @md5_file($path),
-			'type' => @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path),
-			'size' => @filesize($path)
-		);
+
+		$info = null;
+		if (file_exists($path)) {
+			$info = array(
+				'time' => @filemtime($path),
+				'hash' => @md5_file($path),
+				'type' => @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path),
+				'size' => @filesize($path)
+			);
+		}
+
+		return $info;
 	}
 
 	public function delete($key) {
