@@ -75,6 +75,26 @@ class Storage
 	protected $fillBlacklist = array();
 
 	/**
+	 * Temp files
+	 *
+	 * @var array
+	 */
+	protected $tempFiles = array();
+
+	/**
+	 * Destruct
+	 *
+	 * Removes temp files created by
+	 *
+	 * @return	void
+	 */
+	public function __destruct() {
+		foreach ($this->tempFiles as $tempFile) {
+			@unlink($tempFile);
+		}
+	}
+
+	/**
 	 * Normalize Key
 	 *
 	 * @param	string	$key
@@ -400,6 +420,27 @@ class Storage
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Get Temp File
+	 *
+	 * Creates a temporary file with the content of a key. File will be
+	 * automatically deleted when Storage instance destructs.
+	 *
+	 * @param	string	$key
+	 * @param string	$prefix	Prefix to use for temp file.
+	 *
+	 * @return	string	Full path to temporary file.
+	 */
+	public function getTempFile($key, $prefix = 'pel-storage-') {
+		$tempFile = tempnam(sys_get_temp_dir(), $prefix);
+
+		$this->tempFiles[] = $tempFile;
+
+		file_put_contents($tempFile, $this->get($key));
+
+		return $tempFile;
 	}
 
 	/**

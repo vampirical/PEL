@@ -41,6 +41,23 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @depends testSetAndGet
 	 */
+	public function testGetTempFile() {
+		$testKey = 'tempFile';
+		$testValue = "testing\ntesting 1 2 3\n\n";
+
+		$setResult = self::$s->set($testKey, $testValue);
+		$this->assertTrue($setResult);
+
+		$tempFile = self::$s->getTempFile($testKey);
+		$tempFileContent = file_get_contents($tempFile);
+		$this->assertEquals($tempFileContent, $testValue, 'Temp file content does not match test value.');
+
+		usleep(5000000);
+	}
+
+	/**
+	 * @depends testSetAndGet
+	 */
 	public function testExists() {
 		$testKey = 'exists';
 		$testValue = "testing\ntesting 1 2 3\n\n";
