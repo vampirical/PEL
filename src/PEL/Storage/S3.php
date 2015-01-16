@@ -54,7 +54,7 @@ class S3 extends Provider
 
 	public function exists($key) {
 		$info = $this->getInfo($key);
-		return ($info !== false);
+		return !!$info;
 	}
 
 	public function set($key, $value) {
