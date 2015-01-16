@@ -423,24 +423,26 @@ class Storage
 	}
 
 	/**
-	 * Get Temp File
+	 * Get as Temp File
 	 *
 	 * Creates a temporary file with the content of a key. File will be
 	 * automatically deleted when Storage instance destructs.
 	 *
 	 * @param	string	$key
-	 * @param string	$prefix	Prefix to use for temp file.
+	 * @param string	$tempFilePath Full path to temporary file.
 	 *
 	 * @return	string	Full path to temporary file.
 	 */
-	public function getTempFile($key, $prefix = 'pel-storage-') {
-		$tempFile = tempnam(sys_get_temp_dir(), $prefix);
+	public function getAsTempFile($key, $tempFilePath = null) {
+		if (!$tempFilePath) {
+			$tempFilePath = tempnam(sys_get_temp_dir(), 'pel-storage-');
+		}
 
-		$this->tempFiles[] = $tempFile;
+		$this->tempFiles[] = $tempFilePath;
 
-		file_put_contents($tempFile, $this->get($key));
+		file_put_contents($tempFilePath, $this->get($key));
 
-		return $tempFile;
+		return $tempFilePath;
 	}
 
 	/**
