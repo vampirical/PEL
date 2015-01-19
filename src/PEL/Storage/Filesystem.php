@@ -85,7 +85,24 @@ class Filesystem extends Provider
 	}
 
 	public function delete($key) {
-		return unlink($this->getKeyPath($key));
+		$keyPath = $this->getKeyPath($key);
+		if (is_link($keyPath)) {
+			$keyPath = readlink($keyPath);
+		}
+
+		if (is_file($keyPath)) {
+			return unlink($keyPath);
+		} else if (is_dir($keyPath)) {
+			$fsIter = new \FilesystemIterator($keyPath);
+			$emptyDir = !$fsIter->valid();
+			if ($emptyDir) {
+				return rmdir($keyPath);
+			} else {
+				\PEL::log('Unable to delete('. $key .') as it is a non-empty directory.', \PEL::LOG_ERROR);
+			}
+		}
+
+		return false;
 	}
 }
 

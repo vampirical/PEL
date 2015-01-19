@@ -450,21 +450,29 @@ class Storage
 	 *
 	 * @param	string	$key
 	 *
-	 * @return	void
+	 * @return	bool
 	 */
 	public function delete($key) {
 		$key = $this->normalizeKey($key);
 
+		$allowed = 0;
+		$deleted = 0;
 		foreach ($this->providers as $provider) {
 			if (!$provider->allowed($key, self::ACCESS_WRITE)) {
 				continue;
 			}
+			++$allowed;
 
 			if ($this->debug) {
 				\PEL::log('Storage delete, '. get_class($provider) .'->delete('. $key .').', \PEL::LOG_DEBUG);
 			}
-			$provider->delete($key);
+			$result = $provider->delete($key);
+			if ($result) {
+				++$deleted;
+			}
 		}
+
+		return ($allowed > 0 && ($deleted === $allowed));
 	}
 }
 
