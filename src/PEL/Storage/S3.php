@@ -59,7 +59,15 @@ class S3 extends Provider
 
 	public function set($key, $value) {
 		$this->ensureBucketExists($this->bucket);
-		$result = $this->s3->putObject($value, $this->bucket, $key, \S3::ACL_PRIVATE);
+
+		$putInput = array(
+			'data' => $value,
+			'type' => finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $value),
+			'size' => mb_strlen($value, '8bit'),
+			'md5sum' => base64_encode(md5($value, true))
+		);
+		$result = $this->s3->putObject($putInput, $this->bucket, $key, \S3::ACL_PRIVATE);
+
 		return $result;
 	}
 
