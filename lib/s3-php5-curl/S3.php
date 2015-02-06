@@ -1301,7 +1301,6 @@ final class S3Request {
 				'message' => curl_error($curl),
 				'resource' => $this->resource
 			);
-		syslog(LOG_WARNING, 'S3 curl_exec('. $this->verb .' '. curl_getinfo($curl, CURLINFO_EFFECTIVE_URL) .'): '. (microtime(true) - $start));
 
 		@curl_close($curl);
 
