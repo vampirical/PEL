@@ -1218,7 +1218,6 @@ final class S3Request {
 		}
 		$url = ((S3::$useSSL && extension_loaded('openssl')) ?
 		'https://':'http://').$this->headers['Host'].$this->uri;
-		//var_dump($this->bucket, $this->uri, $this->resource, $url);
 
 		// Basic setup
 		$curl = curl_init();
