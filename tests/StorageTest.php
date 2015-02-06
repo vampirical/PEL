@@ -4,6 +4,7 @@ namespace PEL\Tests;
 
 use \PEL\Storage;
 use \PEL\Storage\Filesystem;
+use \PEL\Storage\S3;
 
 require_once dirname(__DIR__) .'/src/PEL.php';
 
@@ -13,7 +14,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 	protected static $provider;
 	protected static $tmpDir;
 
-	public static function setUpBeforeClass() {
+	protected static function initStorage() {
 		self::$s = new Storage();
 
 		self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR .'pel-storage-test-'. rand(0, PHP_INT_MAX);
@@ -21,7 +22,24 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 		self::$s->addProvider(self::$provider);
 	}
 
+	public static function setUpBeforeClass() {
+		self::initStorage();
+	}
+
 	public static function tearDownAfterClass() {
+		self::initStorage(); // Re-init storage to clear blacklists
+
+		self::$s->delete('setAndGet');
+		self::$s->delete('setStreamAndGet');
+		self::$s->delete('setAndGetStream');
+		self::$s->delete('setStreamAndGetStream');
+		self::$s->delete('tempFile');
+		self::$s->delete('exists');
+		self::$s->delete('delete');
+		self::$s->delete('providerBlacklist/blacklist-both');
+		self::$s->delete('providerBlacklist/blacklist-read');
+		self::$s->delete('providerBlacklist/blacklist-write');
+
 		if (!empty(self::$tmpDir)) {
 			exec('rm -rf '. self::$tmpDir);
 		}
@@ -35,7 +53,47 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($setResult);
 
 		$getResult = self::$s->get($testKey);
-		$this->assertEquals($getResult, $testValue);
+		$this->assertEquals($testValue, $getResult);
+	}
+
+	public function testSetStreamAndGet() {
+		$testKey = 'setStreamAndGet';
+		$testValue = "testing\ntesting 1 2 3\n\n";
+		$testFile = tempnam(sys_get_temp_dir(), 'pel-test-storage-');
+
+		file_put_contents($testFile, $testValue);
+
+		$setResult = self::$s->setStream($testKey, fopen($testFile, 'rb'));
+		$this->assertTrue($setResult);
+
+		$getResult = self::$s->get($testKey);
+		$this->assertEquals($testValue, $getResult);
+	}
+
+	public function testSetAndGetStream() {
+		$testKey = 'setAndGetStream';
+		$testValue = "testing\ntesting 1 2 3\n\n";
+		$testFile = tempnam(sys_get_temp_dir(), 'pel-test-storage-');
+
+		$setResult = self::$s->set($testKey, $testValue);
+		$this->assertTrue($setResult);
+
+		$getResult = self::$s->getStream($testKey);
+		$this->assertEquals($testValue, stream_get_contents($getResult));
+	}
+
+	public function testSetStreamAndGetStream() {
+		$testKey = 'setStreamAndGetStream';
+		$testValue = "testing\ntesting 1 2 3\n\n";
+		$testFile = tempnam(sys_get_temp_dir(), 'pel-test-storage-');
+
+		file_put_contents($testFile, $testValue);
+
+		$setResult = self::$s->setStream($testKey, fopen($testFile, 'rb'));
+		$this->assertTrue($setResult);
+
+		$getResult = self::$s->getStream($testKey);
+		$this->assertEquals($testValue, stream_get_contents($getResult));
 	}
 
 	/**
@@ -50,7 +108,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 
 		$tempFile = self::$s->getAsTempFile($testKey);
 		$tempFileContent = file_get_contents($tempFile);
-		$this->assertEquals($tempFileContent, $testValue, 'Temp file content does not match test value.');
+		$this->assertEquals($testValue, $tempFileContent, 'Temp file content does not match test value.');
 	}
 
 	/**
@@ -112,7 +170,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($setResult, 'Blacklisted set succeeded.');
 
 		$getResult = self::$s->get($testKey);
-		$this->assertEquals($getResult, null, 'Blacklisted get succeeded.');
+		$this->assertEquals(null, $getResult, 'Blacklisted get succeeded.');
 
 		$existsResult = self::$s->exists($testKey);
 		$this->assertFalse($existsResult, 'Blacklisted exists succeeded.');
@@ -137,7 +195,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($setResult, 'Non-blacklisted set failed.');
 
 		$getResult = self::$s->get($testKey);
-		$this->assertEquals($getResult, null, 'Blacklisted read succeeded instead of failing.');
+		$this->assertEquals(null, $getResult, 'Blacklisted read succeeded instead of failing.');
 
 		$existsResult = self::$s->exists($testKey);
 		$this->assertFalse($existsResult, 'Blacklisted exists succeeded instead of failing.');
@@ -162,7 +220,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($setResult, 'Blacklisted set succeeded.');
 
 		$getResult = self::$s->get($testKey);
-		$this->assertEquals($getResult, $testValue, 'Non-blacklisted read failed.');
+		$this->assertEquals($testValue, $getResult, 'Non-blacklisted read failed.');
 
 		$existsResult = self::$s->exists($testKey);
 		$this->assertTrue($existsResult, 'Non-blacklisted exists failed.');

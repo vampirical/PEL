@@ -308,12 +308,15 @@ class S3 {
 		);
 
 		// Data
-		if (isset($input['fp']))
+		$fpCloseNeeded = false;
+		if (isset($input['fp'])) {
 			$rest->fp =& $input['fp'];
-		elseif (isset($input['file']))
+		} elseif (isset($input['file'])) {
 			$rest->fp = @fopen($input['file'], 'rb');
-		elseif (isset($input['data']))
+			$fpCloseNeeded = true;
+		} elseif (isset($input['data'])) {
 			$rest->data = $input['data'];
+		}
 
 		// Content-Length (required)
 		if (isset($input['size']) && $input['size'] >= 0)
@@ -351,6 +354,10 @@ class S3 {
 			$rest->getResponse();
 		} else
 			$rest->response->error = array('code' => 0, 'message' => 'Missing input parameters');
+
+		if ($fpCloseNeeded) {
+			fclose($rest->fp);
+		}
 
 		if ($rest->response->error === false && $rest->response->code !== 200)
 			$rest->response->error = array('code' => $rest->response->code, 'message' => 'Unexpected HTTP status');
@@ -1255,6 +1262,9 @@ final class S3Request {
 		curl_setopt($curl, CURLOPT_HEADERFUNCTION, array(&$this, '__responseHeaderCallback'));
 		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 
+		//curl_setopt($curl, CURLOPT_PROXY, '192.168.1.203');
+		//curl_setopt($curl, CURLOPT_PROXYPORT, 8888);
+
 		// Request types
 		switch ($this->verb) {
 			case 'GET': break;
@@ -1283,6 +1293,7 @@ final class S3Request {
 		}
 
 		// Execute, grab errors
+		$start = microtime(true);
 		if (curl_exec($curl))
 			$this->response->code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		else
@@ -1291,6 +1302,7 @@ final class S3Request {
 				'message' => curl_error($curl),
 				'resource' => $this->resource
 			);
+		syslog(LOG_WARNING, 'S3 curl_exec('. $this->verb .' '. curl_getinfo($curl, CURLINFO_EFFECTIVE_URL) .'): '. (microtime(true) - $start));
 
 		@curl_close($curl);
 
@@ -1312,8 +1324,9 @@ final class S3Request {
 			}
 		}
 
+		// Disabled since it breaks passing in a stream
 		// Clean up file resources
-		if ($this->fp !== false && is_resource($this->fp)) fclose($this->fp);
+		// if ($this->fp !== false && is_resource($this->fp)) fclose($this->fp);
 
 		return $this->response;
 	}

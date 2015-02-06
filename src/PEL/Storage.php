@@ -180,7 +180,7 @@ class Storage
 	 *
 	 * @return	mixed
 	 */
-	protected function genericGet($getMethod, $key) {
+	protected function genericGet($getMethod, $key, $stream = null) {
 		$key = $this->normalizeKey($key);
 
 		$fillAllowed = $this->fillAllowed($key);
@@ -191,7 +191,7 @@ class Storage
 				continue;
 			}
 
-			$result = $provider->$getMethod($key);
+			$result = $provider->$getMethod($key, $stream);
 			if ($this->debug) {
 				\PEL::log('Storage '. $getMethod .', '. get_class($provider) .'->'. $getMethod .'('. $key .'): '. substr($result, 0, 10) .'...', \PEL::LOG_DEBUG);
 			}
@@ -338,6 +338,43 @@ class Storage
 	}
 
 	/**
+	 * Set Stream
+	 *
+	 * All sets are currently slow but safe.
+	 * If/when performance starts to become an issue switch to writing to
+	 * first/last provider and then kickoff a cross-provider background sync.
+	 * Gets auto-filling should be a last resort mostly reserved for recovery.
+	 *
+	 * @param	string	 $key
+	 * @param	resource $stream
+	 * @param	int   	 $expiration
+	 *
+	 * @return	bool
+	 */
+	public function setStream($key, $stream, $expiration = null) {
+		$key = $this->normalizeKey($key);
+
+		$allowed = 0;
+		$written = 0;
+		foreach ($this->providers as $provider) {
+			if (!$provider->allowed($key, self::ACCESS_WRITE)) {
+				continue;
+			}
+			++$allowed;
+
+			$result = $provider->setStream($key, $stream, $expiration);
+			if ($this->debug) {
+				\PEL::log('Storage setStream, '. get_class($provider) .'->setStream('. $key .', ...): '. $result, \PEL::LOG_DEBUG);
+			}
+			if ($result) {
+				++$written;
+			}
+		}
+
+		return ($allowed > 0 && ($written === $allowed));
+	}
+
+	/**
 	 * Set File
 	 *
 	 * All sets are currently slow but safe.
@@ -388,12 +425,13 @@ class Storage
 	/**
 	 * Get Stream
 	 *
-	 * @param	string	$key
+	 * @param	string	 $key
+	 * @param resource $stream Optional stream to write to
 	 *
 	 * @return	mixed
 	 */
-	public function getStream($key) {
-		return $this->genericGet('getStream', $key);
+	public function getStream($key, $stream = null) {
+		return $this->genericGet('getStream', $key, $stream);
 	}
 
 	/**

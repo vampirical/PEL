@@ -1736,7 +1736,7 @@ class Record implements \Iterator, \ArrayAccess
 		$remoteRefFields = (array) $refData[2];
 
 		if (count($localRefFields) !== count($remoteRefFields)) {
-			throw new Exception('Reference "'. $name .'" nubmer of reference fields do not match.');
+			throw new Exception('Reference "'. $name .'" number of reference fields do not match.');
 		}
 
 		$valueArray = (array) $value;

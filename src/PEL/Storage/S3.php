@@ -63,8 +63,29 @@ class S3 extends Provider
 		$putInput = array(
 			'data' => $value,
 			'type' => finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $value),
-			'size' => mb_strlen($value, '8bit'),
-			'md5sum' => base64_encode(md5($value, true))
+			'size' => mb_strlen($value, '8bit')
+		);
+		$result = $this->s3->putObject($putInput, $this->bucket, $key, \S3::ACL_PRIVATE);
+
+		return $result;
+	}
+
+	public function setStream($key, $stream) {
+		$this->ensureBucketExists($this->bucket);
+
+		$streamPosition = ftell($stream);
+		rewind($stream);
+		$head = fread($stream, 96);
+		fseek($stream, $streamPosition);
+		$mediaType = finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $head);
+
+		$stats = fstat($stream);
+		$size = $stats['size'];
+
+		$putInput = array(
+			'fp' => $stream,
+			'type' => $mediaType,
+			'size' => $size
 		);
 		$result = $this->s3->putObject($putInput, $this->bucket, $key, \S3::ACL_PRIVATE);
 
@@ -95,6 +116,22 @@ class S3 extends Provider
 	public function get($key) {
 		$object = @$this->s3->getObject($this->bucket, $key);
 		return (isset($object->body)) ? $object->body : null;
+	}
+
+	public function getStream($key, $stream = null) {
+		if (!$stream) {
+			$fiftyMiB = 50 * 1024 * 1024;
+			$stream = fopen("php://temp/maxmemory:$fiftyMiB", 'r+b');
+		}
+
+		$result = @$this->s3->getObject($this->bucket, $key, $stream);
+		rewind($stream);
+
+		if ($result->error) {
+			return null;
+		}
+
+		return $stream;
 	}
 
 	public function getInfo($key) {

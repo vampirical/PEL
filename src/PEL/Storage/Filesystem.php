@@ -48,6 +48,29 @@ class Filesystem extends Provider
 		return $fullyWritten;
 	}
 
+	public function setStream($key, $stream) {
+		$path = $this->getKeyPath($key);
+		$pathExists = self::ensurePathExists($path);
+		$pathHandle = fopen($path, 'wb');
+
+		$stats = fstat($stream);
+		$size = $stats['size'];
+
+		$bytesWritten = 0;
+		while (!feof($stream)) {
+			$bytesWritten += fwrite($pathHandle, fread($stream, 8196));
+		}
+		fclose($pathHandle);
+
+		$fullyWritten = ($bytesWritten === $size);
+		if (!$fullyWritten) {
+			if (!$this->delete($path)) {
+				\PEL::log('Failed to write all bytes to disk and subsequent delete was unsuccessful: '. $path, \PEL::LOG_ERROR);
+			}
+		}
+		return $fullyWritten;
+	}
+
 	public function setFile($key, $file) {
 		$path = $this->getKeyPath($key);
 		$pathExists = self::ensurePathExists($path);
@@ -63,9 +86,25 @@ class Filesystem extends Provider
 		return (is_file($path)) ? file_get_contents($path) : null;
 	}
 
-	public function getStream($key) {
+	public function getStream($key, $stream = null) {
 		$path = $this->getKeyPath($key);
-		return (is_file($path)) ? fopen($path, 'rb') : null;
+
+		if (is_file($path)) {
+			$handle = fopen($path, 'rb');
+
+			if ($stream) {
+				while (!feof($handle)) {
+					fwrite($stream, fread($handle, 8196));
+				}
+				fclose($handle);
+
+				return $stream;
+			}
+
+			return $handle;
+		}
+
+		return null;
 	}
 
 	public function getInfo($key) {

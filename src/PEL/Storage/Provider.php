@@ -90,7 +90,7 @@ abstract class Provider
 	/**
 	 * Store a value
 	 *
-	 * @param string $key
+	 * @param string  $key
 	 * @param string  $value
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
@@ -107,7 +107,10 @@ abstract class Provider
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
 	 */
-	//abstract public function setStream($key, $stream);
+	public function setStream($key, $stream) {
+		$content = stream_get_contents($stream);
+		return $this->set($key, $content);
+	}
 
 	/**
 	 * Store a value from a file
@@ -117,7 +120,10 @@ abstract class Provider
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
 	 */
-	abstract public function setFile($key, $file);
+	public function setFile($key, $file) {
+		$content = file_get_contents($file);
+		return $this->set($key, $content);
+	}
 
 	/**
 	 * Get a value by key
@@ -131,15 +137,17 @@ abstract class Provider
 	/**
 	 * Get a stream by key
 	 *
-	 * @param string $key
+	 * @param string   $key
+	 * @param resource $stream Optional existing stream to write to
 	 *
 	 * @return resource
 	 */
-	public function getStream($key) {
+	public function getStream($key, $stream = null) {
 		$response = $this->get($key);
 		if ($response) {
 			$resource = fopen('php://temp', 'r+b');
 			fwrite($resource, $response);
+			rewind($resource);
 			return $resource;
 		} else {
 			return $response;
