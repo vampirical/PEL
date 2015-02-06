@@ -4,7 +4,6 @@ namespace PEL\Tests;
 
 use \PEL\Storage;
 use \PEL\Storage\Filesystem;
-use \PEL\Storage\S3;
 
 require_once dirname(__DIR__) .'/src/PEL.php';
 

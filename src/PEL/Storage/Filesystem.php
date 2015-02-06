@@ -53,6 +53,7 @@ class Filesystem extends Provider
 		$pathExists = self::ensurePathExists($path);
 		$pathHandle = fopen($path, 'wb');
 
+		$streamPosition = ftell($stream);
 		$stats = fstat($stream);
 		$size = $stats['size'];
 
@@ -68,6 +69,9 @@ class Filesystem extends Provider
 				\PEL::log('Failed to write all bytes to disk and subsequent delete was unsuccessful: '. $path, \PEL::LOG_ERROR);
 			}
 		}
+
+		fseek($stream, $streamPosition);
+
 		return $fullyWritten;
 	}
 

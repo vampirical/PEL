@@ -74,7 +74,6 @@ class S3 extends Provider
 		$this->ensureBucketExists($this->bucket);
 
 		$streamPosition = ftell($stream);
-		rewind($stream);
 		$head = fread($stream, 96);
 		fseek($stream, $streamPosition);
 		$mediaType = finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $head);
@@ -88,6 +87,8 @@ class S3 extends Provider
 			'size' => $size
 		);
 		$result = $this->s3->putObject($putInput, $this->bucket, $key, \S3::ACL_PRIVATE);
+
+		fseek($stream, $streamPosition);
 
 		return $result;
 	}
