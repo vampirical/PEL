@@ -2,6 +2,8 @@
 
 namespace PEL\Storage;
 
+use PEL\Storage;
+
 abstract class Provider
 {
 	protected $blacklist = array();
@@ -11,7 +13,7 @@ abstract class Provider
 	/**
 	 * Add a blacklisted regex, affects both read and writes.
 	 *
-	 * @param	string $regex
+	 * @param string $regex
 	 *
 	 * @return void
 	 */
@@ -22,7 +24,7 @@ abstract class Provider
 	/**
 	 * Add a read only blacklisted regex.
 	 *
-	 * @param	string $regex
+	 * @param string $regex
 	 *
 	 * @return void
 	 */
@@ -33,7 +35,7 @@ abstract class Provider
 	/**
 	 * Add a write only blacklisted regex.
 	 *
-	 * @param	string $regex
+	 * @param string $regex
 	 *
 	 * @return void
 	 */
@@ -44,12 +46,12 @@ abstract class Provider
 	/**
 	 * Check whether a key is valid for this provider.
 	 *
-	 * @param	string $key
+	 * @param string $key
 	 * @param string $type \PEL\Storage::ACCESS_READ or \PEL\Storage::ACCESS_WRITE, defaults to ACCESS_WRITE
 	 *
 	 * @return bool
 	 */
-	public function allowed($key, $type = \PEL\Storage::ACCESS_WRITE) {
+	public function allowed($key, $type = Storage::ACCESS_WRITE) {
 		$blacklisted = false;
 
 		foreach ($this->blacklist as $blacklistRegex) {
@@ -59,14 +61,14 @@ abstract class Provider
 			}
 		}
 
-		if ($type === \PEL\Storage::ACCESS_READ) {
+		if ($type === Storage::ACCESS_READ) {
 			foreach ($this->readBlacklist as $blacklistRegex) {
 				if (preg_match($blacklistRegex, $key)) {
 					$blacklisted = true;
 					break;
 				}
 			}
-		} else if ($type === \PEL\Storage::ACCESS_WRITE) {
+		} else if ($type === Storage::ACCESS_WRITE) {
 			foreach ($this->writeBlacklist as $blacklistRegex) {
 				if (preg_match($blacklistRegex, $key)) {
 					$blacklisted = true;
@@ -90,8 +92,8 @@ abstract class Provider
 	/**
 	 * Store a value
 	 *
-	 * @param string  $key
-	 * @param string  $value
+	 * @param string $key
+	 * @param string $value
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
 	 */
@@ -102,7 +104,7 @@ abstract class Provider
 	 *
 	 * @todo Maybe.
 	 *
-	 * @param string       $key
+	 * @param string   $key
 	 * @param resource $stream
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
@@ -116,7 +118,7 @@ abstract class Provider
 	 * Store a value from a file
 	 *
 	 * @param string $key
-	 * @param string  $file   Path to file.
+	 * @param string $file Path to file.
 	 *
 	 * @return int|bool|null On success, can return the number of bytes written or simple bool true. On failure, can return bool false or null.
 	 */

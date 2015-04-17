@@ -57,10 +57,10 @@ class Storage
 	 */
 	protected $autoFillBack = true;
 	/**
-	 * Automatically propogate values to later specified providers
+	 * Automatically propagate values to later specified providers
 	 * which do not already have the value stored.
 	 *
-	 * Foward is more expensive than back since an exists check is performed
+	 * Forward is more expensive than back since an exists check is performed
 	 * before the write.
 	 *
 	 * @var bool
@@ -86,7 +86,7 @@ class Storage
 	 *
 	 * Removes temp files created by
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	public function __destruct() {
 		foreach ($this->tempFiles as $tempFile) {
@@ -97,9 +97,9 @@ class Storage
 	/**
 	 * Normalize Key
 	 *
-	 * @param	string	$key
+	 * @param string $key
 	 *
-	 * @return	string
+	 * @return string
 	 */
 	protected function normalizeKey($key) {
 		return trim($key, '/\\'. DIRECTORY_SEPARATOR . PATH_SEPARATOR);
@@ -110,9 +110,9 @@ class Storage
 	 *
 	 * Checks top level fill blacklist for a key.
 	 *
-	 * @param	string	$key
+	 * @param string $key
 	 *
-	 * @return	bool
+	 * @return bool
 	 */
 	protected function fillAllowed($key) {
 		$blacklisted = false;
@@ -128,12 +128,12 @@ class Storage
 	/**
 	 * Fill
 	 *
-	 * @param	array	 $providers
-	 * @param	string $key
-	 * @param	mixed	 $value
-	 * @param	bool   $checkExists
+	 * @param array  $providers
+	 * @param string $key
+	 * @param mixed  $value
+	 * @param bool   $checkExists
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	protected function fill($providers, $key, $value, $checkExists = false) {
 		if ($this->debug) {
@@ -160,10 +160,17 @@ class Storage
 				}
 			}
 
-			if ($this->debug) {
-				\PEL::log('Storage fill, '. get_class($provider) .'->set('. $key .', ...).', \PEL::LOG_DEBUG);
+			if (is_resource($value)) {
+				if ($this->debug) {
+					\PEL::log('Storage fill, '. get_class($provider) .'->setStream('. $key .', ...).', \PEL::LOG_DEBUG);
+				}
+				$provider->setStream($key, $value);
+			} else {
+				if ($this->debug) {
+					\PEL::log('Storage fill, '. get_class($provider) .'->set('. $key .', ...).', \PEL::LOG_DEBUG);
+				}
+				$provider->set($key, $value);
 			}
-			$provider->set($key, $value);
 		}
 	}
 
@@ -175,10 +182,10 @@ class Storage
 	 * the two paths differently. This internal method is used by get and
 	 * getStream to consolidate the, at this level, completely shared logic.
 	 *
-	 * @param	string	$getMethod
-	 * @param	string	$key
+	 * @param string $getMethod
+	 * @param string $key
 	 *
-	 * @return	mixed
+	 * @return mixed
 	 */
 	protected function genericGet($getMethod, $key, $stream = null) {
 		$key = $this->normalizeKey($key);
@@ -221,9 +228,9 @@ class Storage
 	/**
 	 * Add Provider
 	 *
-	 * @param	Provider	$provider
+	 * @param Provider $provider
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	public function addProvider($provider) {
 		$this->providers[] = $provider;
@@ -232,9 +239,9 @@ class Storage
 	/**
 	 * Blacklist Fill
 	 *
-	 * @param	string	$regex
+	 * @param string $regex
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	public function blacklistFill($regex) {
 		$this->fillBlacklist[] = $regex;
@@ -245,9 +252,9 @@ class Storage
 	 *
 	 * get/set autoFillBack value
 	 *
-	 * @param	bool|null	$value	Sets value if provided.
+	 * @param bool|null $value Sets value if provided.
 	 *
-	 * @return	bull|null	If no value is provided, return current value.
+	 * @return bull|null If no value is provided, return current value.
 	 */
 	public function autoFillBack($value = null) {
 		if ($value === null) {
@@ -262,9 +269,9 @@ class Storage
 	 *
 	 * get/set autoFillForward value
 	 *
-	 * @param	bool|null	$value	Sets value if provided.
+	 * @param bool|null $value Sets value if provided.
 	 *
-	 * @return	bull|null	If no value is provided, return current value.
+	 * @return bull|null If no value is provided, return current value.
 	 */
 	public function autoFillForward($value = null) {
 		if ($value === null) {
@@ -277,9 +284,9 @@ class Storage
 	/**
 	 * Exists
 	 *
-	 * @param	string	$key
+	 * @param string $key
 	 *
-	 * @return	bool
+	 * @return bool
 	 */
 	public function exists($key) {
 		$key = $this->normalizeKey($key);
@@ -308,11 +315,11 @@ class Storage
 	 * first/last provider and then kickoff a cross-provider background sync.
 	 * Gets auto-filling should be a last resort mostly reserved for recovery.
 	 *
-	 * @param	string	$key
-	 * @param	mixed	  $value
-	 * @param	int   	$expiration
+	 * @param string  $key
+	 * @param mixed   $value
+	 * @param int     $expiration
 	 *
-	 * @return	bool
+	 * @return bool
 	 */
 	public function set($key, $value, $expiration = null) {
 		$key = $this->normalizeKey($key);
@@ -345,11 +352,11 @@ class Storage
 	 * first/last provider and then kickoff a cross-provider background sync.
 	 * Gets auto-filling should be a last resort mostly reserved for recovery.
 	 *
-	 * @param	string	 $key
-	 * @param	resource $stream
-	 * @param	int   	 $expiration
+	 * @param string   $key
+	 * @param resource $stream
+	 * @param int      $expiration
 	 *
-	 * @return	bool
+	 * @return bool
 	 */
 	public function setStream($key, $stream, $expiration = null) {
 		$key = $this->normalizeKey($key);
@@ -382,11 +389,11 @@ class Storage
 	 * first/last provider and then kickoff a cross-provider background sync.
 	 * Gets auto-filling should be a last resort mostly reserved for recovery.
 	 *
-	 * @param	string	$key
-	 * @param	mixed	  $file       Path to file.
-	 * @param	int   	$expiration
+	 * @param string $key
+	 * @param mixed  $file       Path to file.
+	 * @param int    $expiration
 	 *
-	 * @return	bool
+	 * @return bool
 	 */
 	public function setFile($key, $file, $expiration = null) {
 		$key = $this->normalizeKey($key);
@@ -414,9 +421,9 @@ class Storage
 	/**
 	 * Get
 	 *
-	 * @param	string	$key
+	 * @param string $key
 	 *
-	 * @return	mixed
+	 * @return mixed
 	 */
 	public function get($key) {
 		return $this->genericGet('get', $key);
@@ -425,10 +432,10 @@ class Storage
 	/**
 	 * Get Stream
 	 *
-	 * @param	string	 $key
+	 * @param string   $key
 	 * @param resource $stream Optional stream to write to
 	 *
-	 * @return	mixed
+	 * @return resource|null
 	 */
 	public function getStream($key, $stream = null) {
 		return $this->genericGet('getStream', $key, $stream);
@@ -437,9 +444,9 @@ class Storage
 	/**
 	 * Get Info
 	 *
-	 * @param	string	$key
+	 * @param string $key
 	 *
-	 * @return	array|null	Array of meta data properties or null if no providers.
+	 * @return array|null Array of meta data properties or null if no providers.
 	 */
 	public function getInfo($key) {
 		$key = $this->normalizeKey($key);
@@ -466,10 +473,10 @@ class Storage
 	 * Creates a temporary file with the content of a key. File will be
 	 * automatically deleted when Storage instance destructs.
 	 *
-	 * @param	string	$key
-	 * @param string	$tempFilePath Full path to temporary file.
+	 * @param string $key
+	 * @param string $tempFilePath Full path to temporary file.
 	 *
-	 * @return	string	Full path to temporary file.
+	 * @return string Full path to temporary file.
 	 */
 	public function getAsTempFile($key, $tempFilePath = null) {
 		if (!$tempFilePath) {
@@ -486,9 +493,9 @@ class Storage
 	/**
 	 * Delete
 	 *
-	 * @param	string	$key
+	 * @param string $key
 	 *
-	 * @return	bool
+	 * @return bool
 	 */
 	public function delete($key) {
 		$key = $this->normalizeKey($key);
