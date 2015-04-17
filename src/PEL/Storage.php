@@ -200,7 +200,14 @@ class Storage
 
 			$result = $provider->$getMethod($key, $stream);
 			if ($this->debug) {
-				\PEL::log('Storage '. $getMethod .', '. get_class($provider) .'->'. $getMethod .'('. $key .'): '. substr($result, 0, 10) .'...', \PEL::LOG_DEBUG);
+				$displayValue = $result;
+				if (is_string($displayValue)) {
+					$displayValue = substr($displayValue, 0, 10);
+				}
+				if (is_bool($displayValue)) {
+					$displayValue = ($displayValue) ? 'true' : 'false';
+				}
+				\PEL::log('Storage '. $getMethod .', '. get_class($provider) .'->'. $getMethod .'('. $key .'): '. $displayValue .'...', \PEL::LOG_DEBUG);
 			}
 			if (!$result) {
 				$backfillProviders[] = $provider;
