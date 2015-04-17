@@ -9,7 +9,8 @@ class Filesystem extends Provider
 	protected static function ensurePathExists($path) {
 		$dirName = pathinfo($path, PATHINFO_DIRNAME);
 		if (!is_dir($dirName . DIRECTORY_SEPARATOR)) {
-			if (!@mkdir($dirName, 0777, true)) {
+			exec('mkdir --mode=0777 --parents '. escapeshellarg($dirName) .' 2>&1', $mkdirOutput, $mkdirReturnValue);
+			if ($mkdirReturnValue !== 0) {
 				return false;
 			}
 		}
