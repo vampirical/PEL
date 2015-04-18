@@ -7,11 +7,20 @@ class Filesystem extends Provider
 	protected $baseDir;
 
 	protected static function ensurePathExists($path) {
-		$dirName = pathinfo($path, PATHINFO_DIRNAME);
-		if (!is_dir($dirName . DIRECTORY_SEPARATOR)) {
-			exec('mkdir --mode=0777 --parents '. escapeshellarg($dirName) .' 2>&1', $mkdirOutput, $mkdirReturnValue);
-			if ($mkdirReturnValue !== 0) {
-				return false;
+		$dirPath = pathinfo($path, PATHINFO_DIRNAME);
+		if (!is_dir($dirPath . DIRECTORY_SEPARATOR)) {
+			$dirPathParts = explode(DIRECTORY_SEPARATOR, $dirPath);
+			for ($i = 0, $l = count($dirPathParts); $i < $l; ++$i) {
+				$currentDirPath = implode(DIRECTORY_SEPARATOR, array_slice($dirPathParts, 0, $i + 1)) . DIRECTORY_SEPARATOR;
+				if (substr($currentDirPath, 0, 1) !== DIRECTORY_SEPARATOR) {
+					$currentDirPath = DIRECTORY_SEPARATOR . $currentDirPath;
+				}
+				if (!is_dir($currentDirPath)) {
+					exec('mkdir --mode=777 '. escapeshellarg($currentDirPath) .' 2>&1', $mkdirOutput, $mkdirReturnValue);
+					if ($mkdirReturnValue !== 0) {
+						return false;
+					}
+				}
 			}
 		}
 		return true;
