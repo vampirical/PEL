@@ -6,7 +6,7 @@ class Filesystem extends Provider
 {
 	protected $baseDir;
 
-	protected static function ensurePathExists($path) {
+	protected static function ensurePathExists($path, $mode = 777) {
 		$dirPath = pathinfo($path, PATHINFO_DIRNAME);
 		if (!is_dir($dirPath . DIRECTORY_SEPARATOR)) {
 			$dirPathParts = explode(DIRECTORY_SEPARATOR, $dirPath);
@@ -16,7 +16,7 @@ class Filesystem extends Provider
 					$currentDirPath = DIRECTORY_SEPARATOR . $currentDirPath;
 				}
 				if (!is_dir($currentDirPath)) {
-					exec('mkdir --mode=777 '. escapeshellarg($currentDirPath) .' 2>&1', $mkdirOutput, $mkdirReturnValue);
+					exec('mkdir --mode='. escapeshellarg($mode) .' '. escapeshellarg($currentDirPath) .' 2>&1', $mkdirOutput, $mkdirReturnValue);
 					if ($mkdirReturnValue !== 0) {
 						return false;
 					}
