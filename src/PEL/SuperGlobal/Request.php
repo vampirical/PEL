@@ -20,6 +20,8 @@ class Request extends Wrapper
 
 	public function __construct()
 	{
+		parent::__construct();
+
 		$this->link($_REQUEST);
 
 		if (get_magic_quotes_gpc()) {

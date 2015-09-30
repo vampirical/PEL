@@ -18,6 +18,8 @@ class Post extends Wrapper
 {
 	public function __construct(  )
 	{
+		parent::__construct();
+
 		$this->link($_POST);
 
 		if (get_magic_quotes_gpc()) {

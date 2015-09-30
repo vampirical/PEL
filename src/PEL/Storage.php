@@ -182,8 +182,9 @@ class Storage
 	 * the two paths differently. This internal method is used by get and
 	 * getStream to consolidate the, at this level, completely shared logic.
 	 *
-	 * @param string $getMethod
-	 * @param string $key
+	 * @param string   $getMethod
+	 * @param string   $key
+	 * @param resource $stream
 	 *
 	 * @return mixed
 	 */

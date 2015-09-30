@@ -438,6 +438,8 @@ class Record implements \Iterator, \ArrayAccess
 	/**
 	 * Field type
 	 *
+	 * @param string $field
+	 *
 	 * @return mixed|null
 	 */
 	protected static function fieldType($field)
@@ -447,6 +449,8 @@ class Record implements \Iterator, \ArrayAccess
 
 	/**
 	 * Whether field is nullable
+	 *
+	 * @param string $field
 	 *
 	 * @return boolean
 	 */
@@ -458,6 +462,8 @@ class Record implements \Iterator, \ArrayAccess
 	/**
 	 * Whether field is uniquely constrained
 	 *
+	 * @param string $field
+	 *
 	 * @return boolean
 	 */
 	public static function fieldUnique($field)
@@ -468,6 +474,8 @@ class Record implements \Iterator, \ArrayAccess
 	/**
 	 * Whether field is auto populate-able (serial, autoinc, timestamp with CURRENT_TIMESTAMP, etc.)
 	 *
+	 * @param string $field
+	 *
 	 * @return boolean
 	 */
 	public static function fieldAuto($field)
@@ -477,6 +485,8 @@ class Record implements \Iterator, \ArrayAccess
 
 	/**
 	 * Field default value
+	 *
+	 * @param string $field
 	 *
 	 * @return mixed|null
 	 */
@@ -1462,6 +1472,7 @@ class Record implements \Iterator, \ArrayAccess
 	 * Create an array representation of the field data in the object
 	 *
 	 * @param array $fields
+	 * @param bool  $includePrivate
 	 *
 	 * @return array
 	 */
@@ -1502,6 +1513,8 @@ class Record implements \Iterator, \ArrayAccess
 
 	/**
 	 * Create an object representation of the data in the object without primary key fields
+	 *
+	 * @param bool $includePrivate
 	 *
 	 * @return stdClass
 	 */

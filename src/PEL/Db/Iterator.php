@@ -85,14 +85,14 @@ class Iterator implements \Iterator
 	/**
 	 * Offset in result set
 	 *
-	 * @var unknown_type
+	 * @var int
 	 */
 	protected $offset;
 
 	/**
 	 * Result set limit
 	 *
-	 * @var unknown_type
+	 * @var int
 	 */
 	protected $limit;
 

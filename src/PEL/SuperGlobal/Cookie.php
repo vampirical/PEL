@@ -18,6 +18,8 @@ class Cookie extends Wrapper
 {
 	public function __construct()
 	{
+		parent::__construct();
+
 		$this->link($_COOKIE);
 
 		if (get_magic_quotes_gpc()) {

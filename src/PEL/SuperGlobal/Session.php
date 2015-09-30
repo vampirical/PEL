@@ -99,7 +99,7 @@ class Session extends Wrapper
 	public function __unset($variable)
 	{
 		$this->ensureStarted();
-		return parent::__unset($variable);
+		parent::__unset($variable);
 	}
 
 	public function getArray()

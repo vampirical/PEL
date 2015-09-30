@@ -147,7 +147,7 @@ abstract class Provider
 	public function getStream($key, $stream = null) {
 		$response = $this->get($key);
 		if ($response) {
-			$resource = fopen('php://temp', 'r+b');
+			$resource = ($stream) ? $stream : fopen('php://temp', 'r+b');
 			fwrite($resource, $response);
 			rewind($resource);
 			return $resource;

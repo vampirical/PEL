@@ -18,6 +18,8 @@ class Server extends Wrapper
 {
 	public function __construct(  )
 	{
+		parent::__construct();
+
 		$this->link($_SERVER);
 	}
 }

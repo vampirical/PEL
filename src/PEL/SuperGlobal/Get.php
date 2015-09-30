@@ -18,6 +18,8 @@ class Get extends Wrapper
 {
 	public function __construct()
 	{
+		parent::__construct();
+
 		$this->link($_GET);
 
 		if (get_magic_quotes_gpc()) {

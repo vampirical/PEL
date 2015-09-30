@@ -64,8 +64,8 @@ class String
 	* Removing camel casing from a string by inserting a separator character before uppercased characters.
 	* Default separatorCharacter: space ( )
 	*
-	* @param string $string
-	* @param array  $separatorCharacter Defaults to a single space ' '
+	* @param string       $string
+	* @param string|array $separatorCharacter Defaults to a single space ' '
 	*
 	* @return string
 	*/

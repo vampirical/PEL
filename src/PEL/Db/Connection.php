@@ -45,7 +45,7 @@ class Connection extends \PDO
 	protected $cache;
 
 	/**
-	 * Connection contructor
+	 * Connection constructor
 	 *
 	 * @param string $dsn PDO Data Source Name
 	 * @param string $username
