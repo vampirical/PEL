@@ -121,7 +121,7 @@ class Value
 	{
 		$comparison = (isset($this->comparison)) ? $this->comparison : $this->getDefaultComparisonForValue();
 
-		// Morph explicit equal/not-equal to null comparisons when approriate
+		// Morph explicit equal/not-equal to null comparisons when appropriate
 		if ($this->value === null || strtoupper($this->value) === Db::VALUE_NOT_NULL) {
 			if ($comparison === Db::COMPARISON_EQUAL) {
 				$comparison = Db::COMPARISON_IS_NULL;

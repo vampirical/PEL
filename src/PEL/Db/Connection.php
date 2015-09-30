@@ -51,6 +51,8 @@ class Connection extends \PDO
 	 * @param string $username
 	 * @param string $password
 	 * @param array $options
+	 *
+	 * @throws Exception
 	 */
 	public function __construct($dsn, $username = null, $password = null, $options = array())
 	{
@@ -198,6 +200,7 @@ class Connection extends \PDO
 	/**
 	 * Get the current database's name
 	 *
+	 * @throws Exception
 	 * @return string|null
 	 */
 	public function getDbName()

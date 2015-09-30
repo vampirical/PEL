@@ -229,7 +229,9 @@ class Record implements \Iterator, \ArrayAccess
 	/**
 	 * Create a new Record
 	 *
-	 * @param	Connection $dbConnection If an explicit Connection is not provided one will be requested from Db, using $connectionName if set.
+	 * @param Connection $dbConnection If an explicit Connection is not provided one will be requested from Db, using $connectionName if set.
+	 *
+	 * @throws Exception
 	 */
 	public function __construct(Connection $dbConnection = null)
 	{
@@ -486,7 +488,7 @@ class Record implements \Iterator, \ArrayAccess
 	/**
 	 * Get a field value
 	 *
-	 * @param string $property
+	 * @param string $field
 	 *
 	 * @return mixed
 	 */
@@ -498,7 +500,7 @@ class Record implements \Iterator, \ArrayAccess
 	/**
 	 * Set a field value
 	 *
-	 * @param string $property
+	 * @param string $field
 	 * @param mixed  $value
 	 *
 	 * @return boolean
@@ -564,6 +566,7 @@ class Record implements \Iterator, \ArrayAccess
 	 *
 	 * @param string $property
 	 *
+	 * @throws Exception
 	 * @return mixed
 	 */
 	public function __get($property)
@@ -583,6 +586,7 @@ class Record implements \Iterator, \ArrayAccess
 	 * @param string $property
 	 * @param mixed  $value
 	 *
+	 * @throws Exception
 	 * @return boolean
 	 */
 	public function __set($property, $value)
@@ -613,6 +617,8 @@ class Record implements \Iterator, \ArrayAccess
 	 * Magic unset
 	 *
 	 * @param string $property
+	 *
+	 * @throws Exception
 	 */
 	public function __unset($property)
 	{
@@ -712,6 +718,7 @@ class Record implements \Iterator, \ArrayAccess
 	 *
 	 * @param array $fields
 	 *
+	 * @throws Exception
 	 * @return array sqlString => string, values => array
 	 */
 	protected function getWherePack($fields)
@@ -811,7 +818,7 @@ class Record implements \Iterator, \ArrayAccess
 	/**
 	 * Get primary key field values
 	 *
-	 * @param $useInternalValues Return the internal field values.
+	 * @param bool $useInternalValues Return the internal field values.
 	 *
 	 * @return array
 	 */
@@ -1549,10 +1556,11 @@ class Record implements \Iterator, \ArrayAccess
 	/**
 	 * Select field values from table
 	 *
-	 * @param array $fields Fields to select, fields defined in static::$fields will be substituted
-	 * @param array $where If non-empty will be used to select values, otherwise normal data loading logic will be used to select values
+	 * @param array $fields     Fields to select, fields defined in static::$fields will be substituted
+	 * @param array $where      If non-empty will be used to select values, otherwise normal data loading logic will be used to select values
 	 * @param mixed $resultType One of the PDO::FETCH_ constants
 	 *
+	 * @throws Exception
 	 * @return array Array of arrays
 	 */
 	public function select($fields = array(), $where = array(), $resultType = null)
@@ -1632,7 +1640,7 @@ class Record implements \Iterator, \ArrayAccess
 	 *
 	 * @uses $this->references
 	 *
-	 * @param	string $name
+	 * @param string $name
 	 *
 	 * @throws Exception
 	 * @return Record
@@ -1666,7 +1674,7 @@ class Record implements \Iterator, \ArrayAccess
 	 *
 	 * @uses $this->references
 	 *
-	 * @param	string     $name
+	 * @param string     $name
 	 * @param array|null $where
 	 * @param array|null $sort
 	 * @param mixed      $type
@@ -1715,7 +1723,7 @@ class Record implements \Iterator, \ArrayAccess
 	 *
 	 * @uses $this->references
 	 *
-	 * @param	string     $name
+	 * @param string     $name
 	 * @param string     $value
 	 * @param array|null $where
 	 * @param array|null $sort

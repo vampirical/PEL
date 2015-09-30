@@ -21,8 +21,8 @@ class Iterator implements \Iterator
 {
 	const TYPE_RECORD = 'record';
 	const TYPE_OBJECT = 'object';
-	const TYPE_ASSOC = 'assoc';
-	const TYPE_ARRAY = 'array';
+	const TYPE_ASSOC  = 'assoc';
+	const TYPE_ARRAY  = 'array';
 
 	/**
 	 * Database connection
@@ -145,8 +145,11 @@ class Iterator implements \Iterator
 	/**
 	 * Iterator constructor
 	 *
-	 * @param Connection $db
-	 * @param string $objectClass
+	 * @param string     $objectClass
+	 * @param string     $responseType
+	 * @param Connection $dbConnection
+	 *
+	 * @throws Exception
 	 */
 	public function __construct($objectClass, $responseType = null, Connection $dbConnection = null)
 	{
@@ -272,9 +275,8 @@ class Iterator implements \Iterator
 	/**
 	 * Shorthand for adding multiple wheres
 	 *
-	 * @param array $wheres
-	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @throws Exception
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function where()
 	{
@@ -304,11 +306,12 @@ class Iterator implements \Iterator
 	 * Add a where condition
 	 *
 	 * @param string $field
-	 * @param mixed $value
+	 * @param mixed  $value
 	 * @param string $comparison
 	 * @param string $conjunction
 	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @throws Exception
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function addWhere($field, $value, $comparison = null, $conjunction = null)
 	{
@@ -400,7 +403,7 @@ class Iterator implements \Iterator
 	 *
 	 * @param string $where
 	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function addLiteralWhere($where)
 	{
@@ -488,9 +491,7 @@ class Iterator implements \Iterator
 	/**
 	 * Shorthand for adding one or more order bys
 	 *
-	 * @param array $sorts
-	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function sort()
 	{
@@ -531,7 +532,8 @@ class Iterator implements \Iterator
 	 * @param string $field
 	 * @param string $order
 	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @throws Exception
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function addOrderBy($field, $order = null)
 	{
@@ -561,7 +563,7 @@ class Iterator implements \Iterator
 	 *
 	 * @param integer $offset
 	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function offset($offset)
 	{
@@ -575,7 +577,8 @@ class Iterator implements \Iterator
 	 *
 	 * @param integer $offset
 	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @throws Exception
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function setOffset($offset)
 	{
@@ -595,7 +598,7 @@ class Iterator implements \Iterator
 	 *
 	 * @param integer $limit
 	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function limit($limit)
 	{
@@ -609,7 +612,8 @@ class Iterator implements \Iterator
 	 *
 	 * @param integer $limit
 	 *
-	 * @return __CLASS__ Instance for chaining
+	 * @throws Exception
+	 * @return __CLASS__ instance for chaining
 	 */
 	public function setLimit($limit)
 	{
