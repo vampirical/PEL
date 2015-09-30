@@ -261,7 +261,7 @@ class Storage
 	 *
 	 * @param bool|null $value Sets value if provided.
 	 *
-	 * @return bull|null If no value is provided, return current value.
+	 * @return bool|null If no value is provided, return current value.
 	 */
 	public function autoFillBack($value = null) {
 		if ($value === null) {
@@ -278,7 +278,7 @@ class Storage
 	 *
 	 * @param bool|null $value Sets value if provided.
 	 *
-	 * @return bull|null If no value is provided, return current value.
+	 * @return bool|null If no value is provided, return current value.
 	 */
 	public function autoFillForward($value = null) {
 		if ($value === null) {
