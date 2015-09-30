@@ -1552,21 +1552,6 @@ class Record implements \Iterator, \ArrayAccess
 	}
 
 	/**
-	 * Get string representation of Record
-	 *
-	 * @return string
-	 */
-	public function __toString()
-	{
-		$string = '';
-		foreach ($this->getArray() as $field => $value) {
-			$string .= $field .': '. $value ."\n";
-		}
-
-		return $string;
-	}
-
-	/**
 	 * Select field values from table
 	 *
 	 * @param array $fields     Fields to select, fields defined in static::$fields will be substituted
@@ -1907,6 +1892,37 @@ class Record implements \Iterator, \ArrayAccess
 		$sql = $this->getCreateTableSql();
 		$result = $this->db->exec($sql);
 		return $result;
+	}
+
+	// Magic debug
+
+	/**
+	 * Get string representation of Record
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		$string = '';
+		foreach ($this->getArray() as $field => $value) {
+			$string .= $field .': '. $value ."\n";
+		}
+
+		return $string;
+	}
+
+	/**
+	 * Get var_dump() representation of Record
+	 *
+	 * @return array
+	 */
+	public function __debugInfo() {
+		return [
+			'data'     => $this->getArray(null, true),
+			'isLoaded' => $this->isLoaded(),
+			'errorLog' => $this->errorLog,
+			'queryLog' => $this->queryLog
+		];
 	}
 }
 
