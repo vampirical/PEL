@@ -16,7 +16,7 @@ use PEL\Db;
  *
  * @package PEL
  */
-class Record implements \Iterator, \ArrayAccess
+class Record implements \Iterator, \ArrayAccess, \JsonSerializable
 {
 	/**
 	 * Database Connection
@@ -1829,6 +1829,19 @@ class Record implements \Iterator, \ArrayAccess
 
 	public function offsetUnset($offset) {
 		$this->__unset($offset);
+	}
+
+	// \JsonSerializable Implementation
+
+	/**
+	 * Specify data which should be serialized to JSON
+	 *
+	 * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+	 *
+	 * @return mixed Data which can be serialized by json_encode(), which is a value of any type other than a resource.
+	 */
+	public function jsonSerialize() {
+		return $this->getArray();
 	}
 
 	// Utilities
