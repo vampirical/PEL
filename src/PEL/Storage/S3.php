@@ -116,7 +116,7 @@ class S3 extends Provider
 
 	public function get($key) {
 		$object = @$this->s3->getObject($this->bucket, $key);
-		return (isset($object->body)) ? $object->body : null;
+		return (is_object($object) && isset($object->body)) ? $object->body : null;
 	}
 
 	public function getStream($key, $stream = null) {
@@ -128,7 +128,7 @@ class S3 extends Provider
 		$result = @$this->s3->getObject($this->bucket, $key, $stream);
 		rewind($stream);
 
-		if ($result->error) {
+		if (!$result || (is_object($result) && $result->error)) {
 			return null;
 		}
 
