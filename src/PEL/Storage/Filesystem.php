@@ -60,8 +60,12 @@ class Filesystem extends Provider
 
 	public function setStream($key, $stream) {
 		$path = $this->getKeyPath($key);
-		$pathExists = self::ensurePathExists($path);
+		self::ensurePathExists($path);
 		$pathHandle = fopen($path, 'wb');
+		if (!$pathHandle) {
+			\PEL::log('Failed to fopen setStream path: '. $path, \PEL::LOG_ERROR);
+			return false;
+		}
 
 		$streamPosition = ftell($stream);
 		$stats = fstat($stream);
